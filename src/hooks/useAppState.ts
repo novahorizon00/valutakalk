@@ -61,6 +61,14 @@ export function useAppState() {
     if (result.success && result.rates) {
       setRates(result.rates);
       setFetchStatus("success");
+      // Non-blocking warning for malformed but usable data
+      if (result.warnings && result.warnings.length > 0) {
+        const { toast } = await import("sonner");
+        toast.warning("Data quality warning", {
+          description: result.warnings[0],
+          duration: 5000,
+        });
+      }
     } else {
       setLastError(result.error ?? "Unknown error");
       setFetchStatus("error");
