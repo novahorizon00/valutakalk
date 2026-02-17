@@ -33,7 +33,7 @@ const DEFAULT_SETTINGS: UserSettings = {
   targetCurrency: "EUR",
   quickAmounts: [10, 25, 50, 100, 500],
   autoUpdateWifiOnly: false,
-  autoRefreshMinutes: 60,
+  autoRefreshMinutes: 30,
   language: "nb",
 };
 
