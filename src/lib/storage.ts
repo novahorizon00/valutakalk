@@ -1,7 +1,7 @@
 // IndexedDB storage layer with versioning
+// Uses shared helpers from storageHelpers.ts
 
-const DB_NAME = "offline-fx";
-const DB_VERSION = 1;
+import { getFromStore, putToStore } from "./storageHelpers";
 
 export interface CachedRates {
   base: string;
@@ -34,62 +34,6 @@ const DEFAULT_SETTINGS: UserSettings = {
   autoUpdateWifiOnly: false,
   language: "nb",
 };
-
-function openDB(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
-    request.onerror = () => reject(request.error);
-    request.onsuccess = () => resolve(request.result);
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-      if (!db.objectStoreNames.contains("rates")) {
-        db.createObjectStore("rates", { keyPath: "id" });
-      }
-      if (!db.objectStoreNames.contains("settings")) {
-        db.createObjectStore("settings", { keyPath: "id" });
-      }
-      if (!db.objectStoreNames.contains("favorites")) {
-        db.createObjectStore("favorites", { keyPath: "id" });
-      }
-      if (!db.objectStoreNames.contains("history")) {
-        const store = db.createObjectStore("history", { keyPath: "id" });
-        store.createIndex("timestamp", "timestamp", { unique: false });
-      }
-    };
-  });
-}
-
-async function getFromStore<T>(storeName: string, key: string): Promise<T | null> {
-  try {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(storeName, "readonly");
-      const store = tx.objectStore(storeName);
-      const request = store.get(key);
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => resolve(request.result?.data ?? null);
-    });
-  } catch {
-    // Fallback to localStorage
-    const raw = localStorage.getItem(`${DB_NAME}-${storeName}-${key}`);
-    return raw ? JSON.parse(raw) : null;
-  }
-}
-
-async function putToStore<T>(storeName: string, key: string, data: T): Promise<void> {
-  try {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(storeName, "readwrite");
-      const store = tx.objectStore(storeName);
-      const request = store.put({ id: key, data });
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => resolve();
-    });
-  } catch {
-    localStorage.setItem(`${DB_NAME}-${storeName}-${key}`, JSON.stringify(data));
-  }
-}
 
 // Rates
 export async function getCachedRates(): Promise<CachedRates | null> {

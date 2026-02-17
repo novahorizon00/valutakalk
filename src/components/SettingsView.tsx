@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-import { ArrowLeft, Globe } from "lucide-react";
+import { ArrowLeft, Globe, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { t, type Lang } from "@/lib/i18n";
 import { getRatesAge } from "@/lib/rateService";
 import type { UserSettings, CachedRates } from "@/lib/storage";
+import type { ProSubscription } from "@/lib/proSubscription";
 import type { FetchStatus } from "@/hooks/useAppState";
 
 interface SettingsViewProps {
@@ -15,12 +17,14 @@ interface SettingsViewProps {
   fetchStatus: FetchStatus;
   lastError: string | null;
   rates: CachedRates | null;
+  proStatus: ProSubscription;
   onBack: () => void;
   onUpdate: (partial: Partial<UserSettings>) => void;
+  onUpgrade: () => void;
 }
 
 export default function SettingsView({
-  settings, lang, fetchStatus, lastError, rates, onBack, onUpdate,
+  settings, lang, fetchStatus, lastError, rates, proStatus, onBack, onUpdate, onUpgrade,
 }: SettingsViewProps) {
   const [chipsInput, setChipsInput] = useState(settings.quickAmounts.join(", "));
 
@@ -44,6 +48,13 @@ export default function SettingsView({
     return `${Math.floor(hrs / 24)} ${t(lang, "days")}`;
   };
 
+  const formatExpiry = () => {
+    if (!proStatus.expiresAt) return "";
+    return new Date(proStatus.expiresAt).toLocaleDateString(lang === "nb" ? "nb-NO" : "en-US", {
+      year: "numeric", month: "short", day: "numeric",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <header className="flex items-center gap-2 px-4 py-3 border-b border-border">
@@ -54,6 +65,55 @@ export default function SettingsView({
       </header>
 
       <div className="flex-1 overflow-y-auto px-4 py-5 max-w-lg mx-auto w-full space-y-4">
+        {/* Subscription */}
+        <Card className={proStatus.isActive ? "border-primary/30 bg-primary/5" : ""}>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Crown className={`h-4 w-4 ${proStatus.isActive ? "text-primary" : "text-muted-foreground"}`} />
+              {t(lang, "subscription")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-medium text-foreground">
+                  {proStatus.isActive ? t(lang, "proUser") : t(lang, "freeUser")}
+                </div>
+                {proStatus.isActive && proStatus.expiresAt && (
+                  <div className="text-xs text-muted-foreground mt-0.5">
+                    {proStatus.isTrial && (
+                      <Badge variant="secondary" className="text-[10px] mr-1.5 px-1.5 py-0">
+                        {t(lang, "proTrial")}
+                      </Badge>
+                    )}
+                    {t(lang, "proExpires", { date: formatExpiry() })}
+                  </div>
+                )}
+              </div>
+              {proStatus.isActive && (
+                <Badge className="bg-primary/15 text-primary border-primary/25 text-xs">
+                  {t(lang, "proActive")}
+                </Badge>
+              )}
+            </div>
+            {!proStatus.isActive && (
+              <>
+                <p className="text-sm text-muted-foreground">
+                  {t(lang, "proDescription")}
+                </p>
+                <Button onClick={onUpgrade} className="w-full" size="sm">
+                  {t(lang, "offlinePaywallCta")}
+                </Button>
+              </>
+            )}
+            {proStatus.isActive && (
+              <Button variant="outline" size="sm" className="text-xs">
+                {t(lang, "proManage")}
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Language */}
         <Card>
           <CardHeader className="pb-3">
