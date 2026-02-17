@@ -1,12 +1,13 @@
 import React, { useState, useMemo } from "react";
-import { ChevronDown, ChevronUp, Crown, ChevronRight, Plus, X, ArrowRightLeft, WifiOff, Search } from "lucide-react";
+import { ChevronDown, ChevronUp, Crown, ChevronRight, Plus, X, ArrowRightLeft, WifiOff, Search, LineChart } from "lucide-react";
 import FlagIcon from "@/components/FlagIcon";
 import { currencies, COMMON_CURRENCY_CODES, getCurrencyName } from "@/lib/currencies";
 import { t, type Lang } from "@/lib/i18n";
 import { Badge } from "@/components/ui/badge";
+import HistoryChart from "@/components/HistoryChart";
 
-type Mode = "single" | "multi";
-type PickerFor = "base" | "target" | "addCompare" | "addBase" | null;
+type Mode = "single" | "multi" | "history";
+type PickerFor = "base" | "target" | "addCompare" | "addBase" | "historyTarget" | null;
 
 interface AllRatesListProps {
   lang: Lang;
@@ -118,6 +119,10 @@ export default function AllRatesList({ lang, fromCurrency, getRate, formatResult
   );
   const [targetCurrency, setTargetCurrency] = useState(fromCurrency);
 
+  // History mode state
+  const [historyTarget, setHistoryTarget] = useState("EUR");
+  const [historyCompare, setHistoryCompare] = useState<string[]>([]);
+
   React.useEffect(() => {
     setBaseCurrency(fromCurrency);
     setTargetCurrency(fromCurrency);
@@ -135,6 +140,8 @@ export default function AllRatesList({ lang, fromCurrency, getRate, formatResult
       setCompareCurrencies((prev) => [...prev, code]);
     } else if (pickerFor === "addBase") {
       setBaseCurrenciesMulti((prev) => [...prev, code]);
+    } else if (pickerFor === "historyTarget") {
+      setHistoryTarget(code);
     }
     setPickerFor(null);
   };
@@ -144,8 +151,9 @@ export default function AllRatesList({ lang, fromCurrency, getRate, formatResult
     if (pickerFor === "target") return [...baseCurrenciesMulti];
     if (pickerFor === "addCompare") return [baseCurrency, ...compareCurrencies];
     if (pickerFor === "addBase") return [targetCurrency, ...baseCurrenciesMulti];
+    if (pickerFor === "historyTarget") return [baseCurrency, ...historyCompare];
     return [];
-  }, [pickerFor, baseCurrency, compareCurrencies, baseCurrenciesMulti, targetCurrency]);
+  }, [pickerFor, baseCurrency, compareCurrencies, baseCurrenciesMulti, targetCurrency, historyCompare]);
 
   // Single mode data
   const selectedRates = useMemo(() => {
@@ -209,6 +217,13 @@ export default function AllRatesList({ lang, fromCurrency, getRate, formatResult
               >
                 <ArrowRightLeft className="h-3 w-3" />
                 {lang === "nb" ? "Sammenlign" : "Compare"}
+              </button>
+              <button
+                onClick={() => { setMode("history"); closePicker(); }}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1 ${mode === "history" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"}`}
+              >
+                <LineChart className="h-3 w-3" />
+                {lang === "nb" ? "Historikk" : "History"}
               </button>
             </div>
             {!isOnline && (
@@ -299,7 +314,7 @@ export default function AllRatesList({ lang, fromCurrency, getRate, formatResult
                 </div>
               )}
             </>
-          ) : (
+          ) : mode === "multi" ? (
             <>
               {/* Multi mode: target currency selector */}
               <div className="px-4 py-2.5 border-b border-border/50">
@@ -363,7 +378,63 @@ export default function AllRatesList({ lang, fromCurrency, getRate, formatResult
                 <MiniPicker lang={lang} exclude={pickerExclude} onSelect={handlePickerSelect} onClose={closePicker} />
               )}
             </>
-          )}
+          ) : mode === "history" ? (
+            <>
+              {/* History mode: target currency selector */}
+              <div className="px-4 py-2.5 border-b border-border/50">
+                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">
+                  {lang === "nb" ? `${baseCurrency} →` : `${baseCurrency} →`}
+                </div>
+                <button
+                  onClick={() => setPickerFor(pickerFor === "historyTarget" ? null : "historyTarget")}
+                  className="flex items-center gap-2 group"
+                >
+                  <FlagIcon currencyCode={historyTarget} size={22} />
+                  <span className="text-sm font-bold text-foreground">{historyTarget}</span>
+                  <span className="text-xs text-muted-foreground">{getCurrencyName(historyTarget, lang)}</span>
+                  <ChevronRight className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${pickerFor === "historyTarget" ? "rotate-90" : ""}`} />
+                </button>
+              </div>
+              {pickerFor === "historyTarget" && (
+                <MiniPicker lang={lang} exclude={pickerExclude} onSelect={handlePickerSelect} onClose={closePicker} />
+              )}
+
+              <HistoryChart
+                lang={lang}
+                baseCurrency={baseCurrency}
+                targetCurrency={historyTarget}
+                isOnline={isOnline}
+                compareCurrencies={historyCompare.length > 0 ? historyCompare : undefined}
+              />
+
+              {/* Add compare currency to chart */}
+              <div className="px-4 py-2 border-t border-border/50">
+                {historyCompare.length > 0 && (
+                  <div className="flex gap-1.5 flex-wrap mb-2">
+                    {historyCompare.map((c) => (
+                      <span key={c} className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-muted text-muted-foreground">
+                        <FlagIcon currencyCode={c} size={12} />
+                        {c}
+                        <button onClick={() => setHistoryCompare((prev) => prev.filter((x) => x !== c))} className="ml-0.5 hover:text-destructive">
+                          <X className="h-2.5 w-2.5" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <button
+                  onClick={() => {
+                    const next = compareCurrencies.find((c) => c !== historyTarget && !historyCompare.includes(c));
+                    if (next) setHistoryCompare((prev) => [...prev, next]);
+                  }}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80 transition-colors"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  {lang === "nb" ? "Sammenlign med annen valuta" : "Compare with another currency"}
+                </button>
+              </div>
+            </>
+          ) : null}
         </div>
       )}
     </div>
