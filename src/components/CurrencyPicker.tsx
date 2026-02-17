@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { X, Star, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { currencies, COMMON_CURRENCY_CODES, getCurrencyName, type CurrencyInfo } from "@/lib/currencies";
 import { t, type Lang } from "@/lib/i18n";
 
@@ -21,7 +20,7 @@ export default function CurrencyPicker({
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    if (!q) return null; // show grouped view
+    if (!q) return null;
     return currencies.filter(
       (c) =>
         c.code.toLowerCase().includes(q) ||
@@ -40,47 +39,52 @@ export default function CurrencyPicker({
     []
   );
 
-  const renderItem = (c: CurrencyInfo) => (
-    <button
-      key={c.code}
-      onClick={() => onSelect(c.code)}
-      className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-accent/50
-        ${c.code === selected ? "bg-primary/10" : ""}`}
-    >
-      <span className="text-xl">{c.flag}</span>
-      <div className="flex-1 min-w-0">
-        <div className="font-medium text-foreground">{c.code}</div>
-        <div className="text-sm text-muted-foreground truncate">
-          {getCurrencyName(c.code, lang)}
-        </div>
-      </div>
+  const renderItem = (c: CurrencyInfo) => {
+    const isFav = favorites.includes(c.code);
+    const isSel = c.code === selected;
+    return (
       <button
-        onClick={(e) => { e.stopPropagation(); onToggleFavorite(c.code); }}
-        className="p-1.5 rounded-full hover:bg-secondary transition-colors"
-        aria-label={favorites.includes(c.code) ? t(lang, "removeFavorite") : t(lang, "addFavorite")}
+        key={c.code}
+        onClick={() => onSelect(c.code)}
+        className={`w-full flex items-center gap-3.5 px-4 py-3 text-left transition-all
+          ${isSel ? "gradient-primary-subtle border-l-2 border-l-primary" : "hover:bg-muted/60"}`}
       >
-        <Star
-          className={`h-4 w-4 ${favorites.includes(c.code) ? "fill-warning text-warning" : "text-muted-foreground"}`}
-        />
+        <span className="text-2xl leading-none">{c.flag}</span>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <span className={`font-display font-bold text-sm ${isSel ? "text-primary" : "text-foreground"}`}>{c.code}</span>
+            {isFav && <Star className="h-3 w-3 fill-warning text-warning" />}
+          </div>
+          <div className="text-xs text-muted-foreground truncate mt-0.5">
+            {getCurrencyName(c.code, lang)}
+          </div>
+        </div>
+        <button
+          onClick={(e) => { e.stopPropagation(); onToggleFavorite(c.code); }}
+          className="p-2 rounded-full hover:bg-secondary transition-colors"
+          aria-label={isFav ? t(lang, "removeFavorite") : t(lang, "addFavorite")}
+        >
+          <Star className={`h-4 w-4 transition-colors ${isFav ? "fill-warning text-warning" : "text-muted-foreground/40"}`} />
+        </button>
       </button>
-    </button>
-  );
+    );
+  };
 
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col animate-in slide-in-from-bottom duration-200">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-card">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
+          <input
             autoFocus
             placeholder={t(lang, "search")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
+            className="w-full bg-muted border-0 rounded-xl pl-9 pr-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
-        <Button variant="ghost" size="icon" onClick={onClose} aria-label={t(lang, "close")}>
+        <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full" aria-label={t(lang, "close")}>
           <X className="h-5 w-5" />
         </Button>
       </div>
@@ -89,17 +93,17 @@ export default function CurrencyPicker({
       <div className="flex-1 overflow-y-auto">
         {filtered ? (
           filtered.length === 0 ? (
-            <div className="p-8 text-center text-muted-foreground">No results</div>
+            <div className="p-12 text-center text-muted-foreground text-sm">No results</div>
           ) : (
             filtered.map(renderItem)
           )
         ) : (
           <>
-            <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted/50">
+            <div className="px-4 py-2.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-muted/40 border-b border-border">
               {t(lang, "commonCurrencies")}
             </div>
             {commonCurrencies.map(renderItem)}
-            <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted/50">
+            <div className="px-4 py-2.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-muted/40 border-b border-border">
               {t(lang, "allCurrencies")}
             </div>
             {otherCurrencies.map(renderItem)}
