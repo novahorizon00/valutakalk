@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ArrowLeftRight, RefreshCw, History, Settings, Wifi, WifiOff, ChevronRight } from "lucide-react";
+import { ArrowLeftRight, RefreshCw, History, Settings, Wifi, WifiOff, ChevronRight, Plane } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAppState } from "@/hooks/useAppState";
@@ -117,6 +117,18 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      {/* Pro banner for free users */}
+      {!isPro && (
+        <button
+          onClick={handleUpgrade}
+          className="w-full flex items-center gap-2.5 px-4 py-2.5 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/5 border-b border-primary/10 text-xs font-medium text-primary hover:from-primary/15 hover:via-accent/15 transition-all"
+        >
+          <Plane className="h-3.5 w-3.5 flex-shrink-0" />
+          <span className="flex-1 text-left">{t(lang, "offlinePaywallCta")}</span>
+          <ChevronRight className="h-3.5 w-3.5 flex-shrink-0 opacity-50" />
+        </button>
+      )}
+
       {/* Header with gradient */}
       <header className="gradient-primary px-5 pt-4 pb-5 text-primary-foreground">
         <div className="flex items-center justify-between mb-4">

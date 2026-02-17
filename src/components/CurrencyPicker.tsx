@@ -25,9 +25,10 @@ export default function CurrencyPicker({
       (c) =>
         c.code.toLowerCase().includes(q) ||
         c.name.toLowerCase().includes(q) ||
-        c.nameNb.toLowerCase().includes(q)
+        c.nameNb.toLowerCase().includes(q) ||
+        getCurrencyName(c.code, lang).toLowerCase().includes(q)
     );
-  }, [search]);
+  }, [search, lang]);
 
   const commonCurrencies = useMemo(
     () => COMMON_CURRENCY_CODES.map((code) => currencies.find((c) => c.code === code)!).filter(Boolean),
@@ -99,6 +100,17 @@ export default function CurrencyPicker({
           )
         ) : (
           <>
+            {favorites.length > 0 && (
+              <>
+                <div className="px-4 py-2.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-muted/40 border-b border-border">
+                  {t(lang, "favorites")}
+                </div>
+                {favorites.map((code) => {
+                  const c = currencies.find((cur) => cur.code === code);
+                  return c ? renderItem(c) : null;
+                })}
+              </>
+            )}
             <div className="px-4 py-2.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-muted/40 border-b border-border">
               {t(lang, "commonCurrencies")}
             </div>
