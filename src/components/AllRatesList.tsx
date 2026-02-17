@@ -14,6 +14,7 @@ interface AllRatesListProps {
   getRate: (from: string, to: string) => number | null;
   formatResult: (num: number) => string;
   isOnline: boolean;
+  onQuickSetTarget?: (code: string) => void;
 }
 
 const DEFAULT_COMPARE = ["EUR", "USD", "GBP", "SEK", "DKK"];
@@ -99,7 +100,7 @@ function MiniPicker({ lang, exclude, onSelect, onClose }: {
   );
 }
 
-export default function AllRatesList({ lang, fromCurrency, getRate, formatResult, isOnline }: AllRatesListProps) {
+export default function AllRatesList({ lang, fromCurrency, getRate, formatResult, isOnline, onQuickSetTarget }: AllRatesListProps) {
   const [expanded, setExpanded] = useState(false);
   const [mode, setMode] = useState<Mode>("single");
   const [pickerFor, setPickerFor] = useState<PickerFor>(null);
@@ -239,13 +240,19 @@ export default function AllRatesList({ lang, fromCurrency, getRate, formatResult
               {/* Selected comparison currencies */}
               <div className="divide-y divide-border/50">
                 {selectedRates.map(({ code, rate }) => (
-                  <div key={code} className="flex items-center gap-3 px-4 py-2.5">
-                    <FlagIcon currencyCode={code} size={20} />
-                    <div className="flex-1 min-w-0">
-                      <span className="text-xs font-semibold text-foreground">{code}</span>
-                      <span className="text-[11px] text-muted-foreground ml-1.5">{getCurrencyName(code, lang)}</span>
-                    </div>
-                    <span className="text-xs font-mono font-medium text-foreground tabular-nums mr-2">{formatResult(rate!)}</span>
+                  <div key={code} className="flex items-center gap-3 px-4 py-2.5 group">
+                    <button
+                      onClick={() => onQuickSetTarget?.(code)}
+                      className="flex items-center gap-3 flex-1 min-w-0 text-left hover:bg-muted/30 -ml-1 pl-1 rounded-lg transition-colors"
+                      title={lang === "nb" ? `Sett ${code} som målvaluta` : `Set ${code} as target`}
+                    >
+                      <FlagIcon currencyCode={code} size={20} />
+                      <div className="flex-1 min-w-0">
+                        <span className="text-xs font-semibold text-foreground">{code}</span>
+                        <span className="text-[11px] text-muted-foreground ml-1.5">{getCurrencyName(code, lang)}</span>
+                      </div>
+                      <span className="text-xs font-mono font-medium text-foreground tabular-nums">{formatResult(rate!)}</span>
+                    </button>
                     <button onClick={() => toggleCompare(code)} className="p-1 rounded-full hover:bg-destructive/10 transition-colors" aria-label="Remove">
                       <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />
                     </button>
