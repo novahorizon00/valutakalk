@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ArrowLeftRight, RefreshCw, History, Settings, Wifi, WifiOff, ChevronRight, Plane } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeftRight, RefreshCw, History, Settings, Wifi, WifiOff, ChevronRight, Plane, Keyboard } from "lucide-react";
 import FlagIcon from "@/components/FlagIcon";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,8 +15,12 @@ import SettingsView from "@/components/SettingsView";
 import OfflinePaywall from "@/components/OfflinePaywall";
 import AllRatesList from "@/components/AllRatesList";
 import WidgetSetup, { type WidgetConfig } from "@/components/WidgetSetup";
+import NumericKeypad from "@/components/NumericKeypad";
+import OnboardingGuide from "@/components/OnboardingGuide";
 
 type View = "converter" | "history" | "settings" | "widget";
+
+const ONBOARDING_KEY = "offline-fx-onboarding-done";
 
 const Index = () => {
   const {
@@ -32,6 +37,8 @@ const Index = () => {
   const [pickerTarget, setPickerTarget] = useState<"from" | "to" | null>(null);
   const [view, setView] = useState<View>("converter");
   const [widgetConfig, setWidgetConfig] = useState<WidgetConfig>({ currency1: "NOK", currency2: "EUR" });
+  const [showKeypad, setShowKeypad] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem(ONBOARDING_KEY));
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   const lang: Lang = settings?.language ?? "nb";
@@ -84,6 +91,10 @@ const Index = () => {
     const status = await activateDevSubscription(7);
     updateProStatus(status);
   };
+  const handleOnboardingComplete = () => {
+    localStorage.setItem(ONBOARDING_KEY, "1");
+    setShowOnboarding(false);
+  };
 
   const locale = lang === "nb" ? "nb-NO" : "en-US";
   const formatResult = (num: number): string => {
@@ -104,14 +115,18 @@ const Index = () => {
 
   const quickAmounts = settings?.quickAmounts ?? [10, 25, 50, 100, 500];
   const isStale = rates ? areRatesStale(rates.timestamp) : false;
-  const fromInfo = getCurrencyInfo(fromCurrency);
-  const toInfo = getCurrencyInfo(toCurrency);
   const rate = getRate(fromCurrency, toCurrency);
 
   if (!settings) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="animate-pulse-soft text-primary font-display text-2xl font-bold">Offline FX</div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-primary font-display text-2xl font-bold"
+        >
+          Offline FX
+        </motion.div>
       </div>
     );
   }
@@ -122,16 +137,23 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      {/* Onboarding */}
+      <AnimatePresence>
+        {showOnboarding && <OnboardingGuide lang={lang} onComplete={handleOnboardingComplete} />}
+      </AnimatePresence>
+
       {/* Pro banner for free users */}
       {!isPro && (
-        <button
+        <motion.button
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
           onClick={handleUpgrade}
           className="w-full flex items-center gap-2.5 px-4 py-2.5 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/5 border-b border-primary/10 text-xs font-medium text-primary hover:from-primary/15 hover:via-accent/15 transition-all"
         >
           <Plane className="h-3.5 w-3.5 flex-shrink-0" />
           <span className="flex-1 text-left">{t(lang, "offlinePaywallCta")}</span>
           <ChevronRight className="h-3.5 w-3.5 flex-shrink-0 opacity-50" />
-        </button>
+        </motion.button>
       )}
 
       {/* Top bar */}
@@ -154,16 +176,23 @@ const Index = () => {
       </div>
 
       {/* Offline banner */}
-      {!isOnline && rates && (
-        <div className="mx-4 mt-2 bg-accent/50 border border-border rounded-xl px-4 py-3 space-y-1">
-          <div className="flex items-center gap-2">
-            <WifiOff className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-            <span className="text-sm font-semibold text-foreground">{t(lang, "offlineBannerTitle")}</span>
-          </div>
-          <p className="text-xs text-muted-foreground leading-relaxed">{t(lang, "offlineBannerDesc")}</p>
-          <p className="text-[11px] text-muted-foreground/70">{t(lang, "lastUpdated")}: {formatAge()}</p>
-        </div>
-      )}
+      <AnimatePresence>
+        {!isOnline && rates && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mx-4 mt-2 bg-accent/50 border border-border rounded-xl px-4 py-3 space-y-1"
+          >
+            <div className="flex items-center gap-2">
+              <WifiOff className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <span className="text-sm font-semibold text-foreground">{t(lang, "offlineBannerTitle")}</span>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">{t(lang, "offlineBannerDesc")}</p>
+            <p className="text-[11px] text-muted-foreground/70">{t(lang, "lastUpdated")}: {formatAge()}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Stale / no rates warnings */}
       {isStale && rates && isOnline && (
@@ -179,7 +208,10 @@ const Index = () => {
 
       <main className="flex-1 px-4 py-3 max-w-lg mx-auto w-full space-y-3">
         {/* FROM: currency selector + amount */}
-        <div className="bg-card border border-border rounded-2xl p-4 space-y-2">
+        <motion.div
+          layout
+          className="glass-card bg-card border border-border rounded-2xl p-4 space-y-2"
+        >
           <button
             onClick={() => setPickerTarget("from")}
             className="w-full flex items-center gap-3 text-left group"
@@ -191,20 +223,49 @@ const Index = () => {
             </div>
             <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
           </button>
-          <input
-            type="number"
-            inputMode="decimal"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="w-full text-3xl font-display font-bold bg-muted/50 border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:ring-2 focus:ring-ring transition-all"
-            placeholder="0"
-            aria-label={t(lang, "amount")}
-          />
+
+          {/* Amount display (always shown) */}
+          <div className="relative">
+            <input
+              type={showKeypad ? "text" : "number"}
+              inputMode={showKeypad ? "none" : "decimal"}
+              readOnly={showKeypad}
+              value={amount}
+              onChange={(e) => !showKeypad && setAmount(e.target.value)}
+              onFocus={() => {}}
+              className="w-full text-3xl font-display font-bold bg-muted/50 border border-border rounded-xl px-4 py-3 pr-12 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:ring-2 focus:ring-ring transition-all"
+              placeholder="0"
+              aria-label={t(lang, "amount")}
+            />
+            <button
+              onClick={() => setShowKeypad(!showKeypad)}
+              className={`absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-colors ${showKeypad ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"}`}
+              aria-label="Toggle keypad"
+            >
+              <Keyboard className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Keypad */}
+          <AnimatePresence>
+            {showKeypad && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <NumericKeypad value={amount} onChange={setAmount} lang={lang} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Quick amounts */}
           <div className="flex gap-1.5 flex-wrap">
             {quickAmounts.map((val) => (
-              <button
+              <motion.button
                 key={val}
+                whileTap={{ scale: 0.93 }}
                 onClick={() => handleQuickAmount(val)}
                 className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold transition-all
                   ${parseFloat(amount) === val
@@ -213,29 +274,34 @@ const Index = () => {
                   }`}
               >
                 {val}
-              </button>
+              </motion.button>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Swap */}
         <div className="flex justify-center -my-1 relative z-10">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleSwap}
-            className="rounded-full h-9 w-9 border-2 border-border bg-card shadow-sm hover:shadow-md hover:border-primary/40 transition-all"
-            aria-label={t(lang, "swap")}
-          >
-            <ArrowLeftRight className="h-4 w-4 text-primary" />
-          </Button>
+          <motion.div whileTap={{ rotate: 180 }} transition={{ duration: 0.3 }}>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleSwap}
+              className="rounded-full h-9 w-9 border-2 border-border bg-card shadow-sm hover:shadow-md hover:border-primary/40 transition-all"
+              aria-label={t(lang, "swap")}
+            >
+              <ArrowLeftRight className="h-4 w-4 text-primary" />
+            </Button>
+          </motion.div>
         </div>
 
         {/* TO: currency selector + result */}
         {showOfflinePaywall ? (
           <OfflinePaywall lang={lang} onUpgrade={handleUpgrade} />
         ) : (
-          <div className="bg-card border border-border rounded-2xl p-4 space-y-2">
+          <motion.div
+            layout
+            className="glass-card bg-card border border-border rounded-2xl p-4 space-y-2"
+          >
             <button
               onClick={() => setPickerTarget("to")}
               className="w-full flex items-center gap-3 text-left group"
@@ -248,13 +314,22 @@ const Index = () => {
               <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
             </button>
             <div className="bg-muted/50 border border-border rounded-xl px-4 py-3 min-h-[60px] flex items-center">
-              {result !== null ? (
-                <span className="text-3xl font-display font-bold text-foreground tracking-tight">
-                  {formatResult(result)}
-                </span>
-              ) : (
-                <span className="text-3xl font-display font-bold text-muted-foreground/30">—</span>
-              )}
+              <AnimatePresence mode="wait">
+                {result !== null ? (
+                  <motion.span
+                    key={result}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.2 }}
+                    className="text-3xl font-display font-bold text-foreground tracking-tight"
+                  >
+                    {formatResult(result)}
+                  </motion.span>
+                ) : (
+                  <span className="text-3xl font-display font-bold text-muted-foreground/30">—</span>
+                )}
+              </AnimatePresence>
             </div>
             {rate !== null && (
               <div className="text-xs text-muted-foreground flex items-center gap-1">
@@ -264,7 +339,7 @@ const Index = () => {
             {!isOnline && isPro && (
               <Badge variant="secondary" className="text-[10px]">{t(lang, "offlineRates")}</Badge>
             )}
-          </div>
+          </motion.div>
         )}
 
         {/* Favorites */}
@@ -275,8 +350,9 @@ const Index = () => {
               if (!info) return null;
               const isActive = code === fromCurrency || code === toCurrency;
               return (
-                <button
+                <motion.button
                   key={code}
+                  whileTap={{ scale: 0.93 }}
                   onClick={() => handleFavoriteTap(code)}
                   className={`flex-shrink-0 flex items-center gap-1.5 pl-1.5 pr-2.5 py-1 rounded-full text-xs font-semibold transition-all
                     ${isActive
@@ -286,7 +362,7 @@ const Index = () => {
                 >
                   <FlagIcon currencyCode={code} size={16} />
                   <span>{code}</span>
-                </button>
+                </motion.button>
               );
             })}
           </div>
@@ -305,7 +381,7 @@ const Index = () => {
         )}
 
         {/* Status + refresh */}
-        <div className="flex items-center justify-between text-[11px] text-muted-foreground bg-card border border-border rounded-xl px-3 py-2">
+        <div className="flex items-center justify-between text-[11px] text-muted-foreground glass-card bg-card border border-border rounded-xl px-3 py-2">
           <div className="flex items-center gap-2">
             <span className={`flex items-center gap-1 font-medium ${isOnline ? "text-green-600 dark:text-green-400" : "text-destructive"}`}>
               {isOnline ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
