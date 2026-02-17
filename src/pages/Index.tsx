@@ -275,9 +275,16 @@ const Index = () => {
           </div>
         )}
 
-        {/* Last updated + refresh */}
-        <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-          <span>{t(lang, "lastUpdated")}: {formatAge()}</span>
+        {/* Status + refresh */}
+        <div className="flex items-center justify-between text-[11px] text-muted-foreground bg-card border border-border rounded-xl px-3 py-2">
+          <div className="flex items-center gap-2">
+            <span className={`flex items-center gap-1 font-medium ${isOnline ? "text-green-600 dark:text-green-400" : "text-destructive"}`}>
+              {isOnline ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
+              {isOnline ? "Online" : "Offline"}
+            </span>
+            <span className="text-muted-foreground/50">·</span>
+            <span>{t(lang, "lastUpdated")}: {formatAge()}</span>
+          </div>
           <Button
             variant="ghost"
             size="sm"
