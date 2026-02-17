@@ -296,6 +296,7 @@ const Index = () => {
             fromCurrency={fromCurrency}
             getRate={getRate}
             formatResult={formatResult}
+            isOnline={isOnline}
           />
         )}
 
