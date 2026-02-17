@@ -1,1 +1,4 @@
 project_id = "ysncgfbjewfquvqyucvg"
+
+[functions.fetch-historical-rates]
+verify_jwt = false
