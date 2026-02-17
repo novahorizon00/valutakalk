@@ -122,7 +122,35 @@ export default function SettingsView({
           </CardContent>
         </Card>
 
-        {/* Auto update */}
+        {/* Auto-refresh interval */}
+        <Card>
+          <CardContent className="pt-5 pb-4 space-y-3">
+            <span className="font-semibold text-sm">{t(lang, "autoRefresh")}</span>
+            <div className="flex gap-1.5 flex-wrap">
+              {[
+                { value: 0, label: t(lang, "autoRefreshOff") },
+                { value: 30, label: "30 min" },
+                { value: 60, label: "1h" },
+                { value: 180, label: "3h" },
+                { value: 360, label: "6h" },
+              ].map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => onUpdate({ autoRefreshMinutes: opt.value })}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all
+                    ${settings.autoRefreshMinutes === opt.value
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Auto update Wi-Fi */}
         <Card>
           <CardContent className="pt-5 pb-4">
             <div className="flex items-center justify-between">
