@@ -85,7 +85,8 @@ const Index = () => {
     return () => clearTimeout(timer);
   }, [result]);
 
-  const handleSwap = () => { setFromCurrency(toCurrency); setToCurrency(fromCurrency); };
+  const [swapKey, setSwapKey] = useState(0);
+  const handleSwap = () => { setSwapKey((k) => k + 1); setFromCurrency(toCurrency); setToCurrency(fromCurrency); };
   const handleQuickAmount = (val: number) => setAmount(val.toString());
   const handleCurrencySelect = (code: string) => {
     if (pickerTarget === "favorites") {
@@ -219,157 +220,188 @@ const Index = () => {
         </div>
       )}
 
-      <main className="flex-1 px-4 py-3 max-w-lg mx-auto w-full space-y-3">
-        {/* FROM: currency selector + amount */}
-        <motion.div
-          layout
-          className="glass-card bg-card border border-border rounded-2xl p-4 space-y-2"
-        >
-          <button
-            onClick={() => setPickerTarget("from")}
-            className="w-full flex items-center gap-3 text-left group"
-          >
-            <FlagIcon currencyCode={fromCurrency} size={36} />
-            <div className="flex-1 min-w-0">
-              <div className="font-display font-bold text-base text-foreground leading-tight">{fromCurrency}</div>
-              <div className="text-xs text-muted-foreground truncate">{getCurrencyName(fromCurrency, lang)}</div>
-            </div>
-            <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-          </button>
-
-          {/* Amount display (always shown) */}
-          <div className="relative">
-            <input
-              type={showKeypad ? "text" : "number"}
-              inputMode={showKeypad ? "none" : "decimal"}
-              readOnly={showKeypad}
-              value={amount}
-              onChange={(e) => !showKeypad && setAmount(e.target.value)}
-              onFocus={() => {}}
-              className="w-full text-3xl font-display font-bold bg-muted/50 border border-border rounded-xl px-4 py-3 pr-12 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:ring-2 focus:ring-ring transition-all"
-              placeholder="0"
-              aria-label={t(lang, "amount")}
-            />
-            <button
-              onClick={() => setShowKeypad(!showKeypad)}
-              className={`absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-colors ${showKeypad ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"}`}
-              aria-label="Toggle keypad"
-            >
-              <Keyboard className="h-4 w-4" />
-            </button>
-          </div>
-
-          {/* Keypad */}
-          <AnimatePresence>
-            {showKeypad && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <NumericKeypad value={amount} onChange={setAmount} lang={lang} />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Quick amounts */}
-          <div className="flex gap-1.5 flex-wrap">
-            {quickAmounts.map((val) => (
-              <motion.button
-                key={val}
-                whileTap={{ scale: 0.93 }}
-                onClick={() => handleQuickAmount(val)}
-                className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold transition-all
-                  ${parseFloat(amount) === val
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground hover:bg-muted/80"
-                  }`}
-              >
-                {val}
-              </motion.button>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Swap */}
-        <div className="flex justify-center -my-1 relative z-10">
-          <motion.div whileTap={{ rotate: 180 }} transition={{ duration: 0.3 }}>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleSwap}
-              className="rounded-full h-9 w-9 border-2 border-border bg-card shadow-sm hover:shadow-md hover:border-primary/40 transition-all"
-              aria-label={t(lang, "swap")}
-            >
-              <ArrowLeftRight className="h-4 w-4 text-primary" />
-            </Button>
-          </motion.div>
-        </div>
-
-        {/* TO: currency selector + result */}
-        {showOfflinePaywall ? (
-          <OfflinePaywall lang={lang} onUpgrade={handleUpgrade} />
-        ) : (
+      <main className="flex-1 px-4 py-3 max-w-3xl mx-auto w-full space-y-3">
+        {/* Converter cards – side by side on tablet+ */}
+        <div className="flex flex-col md:flex-row md:items-stretch md:gap-3">
+          {/* FROM: currency selector + amount */}
           <motion.div
             layout
-            className="glass-card bg-card border border-border rounded-2xl p-4 space-y-2"
+            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+            className="glass-card bg-card border border-border rounded-2xl p-4 space-y-2 md:flex-1"
           >
             <button
-              onClick={() => setPickerTarget("to")}
-              className="w-full flex items-center gap-3 text-left group"
+              onClick={() => setPickerTarget("from")}
+              className="w-full flex items-center gap-3 text-left group press-effect"
             >
-              <FlagIcon currencyCode={toCurrency} size={36} />
+              <motion.div key={fromCurrency} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 500, damping: 25 }}>
+                <FlagIcon currencyCode={fromCurrency} size={36} />
+              </motion.div>
               <div className="flex-1 min-w-0">
-                <div className="font-display font-bold text-base text-foreground leading-tight">{toCurrency}</div>
-                <div className="text-xs text-muted-foreground truncate">{getCurrencyName(toCurrency, lang)}</div>
+                <motion.div key={fromCurrency + "-name"} initial={{ x: -8, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="font-display font-bold text-base text-foreground leading-tight">{fromCurrency}</motion.div>
+                <div className="text-xs text-muted-foreground truncate">{getCurrencyName(fromCurrency, lang)}</div>
               </div>
-              <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
             </button>
-            <div className="bg-muted/50 border border-border rounded-xl px-4 py-3 min-h-[60px] flex items-center">
-              <AnimatePresence mode="wait">
-                {result !== null ? (
-                  <motion.span
-                    key={result}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.2 }}
-                    className="text-3xl font-display font-bold text-foreground tracking-tight"
-                  >
-                    {formatResult(result)}
-                  </motion.span>
-                ) : (
-                  <span className="text-3xl font-display font-bold text-muted-foreground/30">—</span>
-                )}
-              </AnimatePresence>
+
+            {/* Amount display */}
+            <div className="relative">
+              <input
+                type={showKeypad ? "text" : "number"}
+                inputMode={showKeypad ? "none" : "decimal"}
+                readOnly={showKeypad}
+                value={amount}
+                onChange={(e) => !showKeypad && setAmount(e.target.value)}
+                onFocus={() => {}}
+                className="w-full text-3xl font-display font-bold bg-muted/50 border border-border rounded-xl px-4 py-3 pr-12 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/30 transition-all duration-200"
+                placeholder="0"
+                aria-label={t(lang, "amount")}
+              />
+              <button
+                onClick={() => setShowKeypad(!showKeypad)}
+                className={`absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-all duration-200 ${showKeypad ? "bg-primary text-primary-foreground shadow-md" : "text-muted-foreground hover:bg-muted hover:scale-110"}`}
+                aria-label="Toggle keypad"
+              >
+                <Keyboard className="h-4 w-4" />
+              </button>
             </div>
-            {rate !== null && (
-              <div className="text-xs text-muted-foreground flex items-center gap-1">
-                <FlagIcon currencyCode={fromCurrency} size={14} /> 1 {fromCurrency} = {formatResult(rate)} {toCurrency} <FlagIcon currencyCode={toCurrency} size={14} />
-              </div>
-            )}
-            {!isOnline && isPro && (
-              <Badge variant="secondary" className="text-[10px]">{t(lang, "offlineRates")}</Badge>
-            )}
+
+            {/* Keypad */}
+            <AnimatePresence>
+              {showKeypad && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                >
+                  <NumericKeypad value={amount} onChange={setAmount} lang={lang} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Quick amounts */}
+            <div className="flex gap-1.5 flex-wrap">
+              {quickAmounts.map((val, i) => (
+                <motion.button
+                  key={val}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.03, type: "spring", stiffness: 500, damping: 25 }}
+                  whileTap={{ scale: 0.88 }}
+                  whileHover={{ scale: 1.05 }}
+                  onClick={() => handleQuickAmount(val)}
+                  className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold transition-colors duration-200
+                    ${parseFloat(amount) === val
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    }`}
+                >
+                  {val}
+                </motion.button>
+              ))}
+            </div>
           </motion.div>
-        )}
+
+          {/* Swap – vertical on mobile, horizontal on tablet */}
+          <div className="flex justify-center md:items-center -my-1 md:my-0 relative z-10">
+            <motion.div
+              key={swapKey}
+              animate={{ rotate: [0, 180] }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            >
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleSwap}
+                className="rounded-full h-10 w-10 border-2 border-border bg-card shadow-sm hover:shadow-lg hover:border-primary/40 hover:scale-110 active:scale-95 transition-all duration-200"
+                aria-label={t(lang, "swap")}
+              >
+                <ArrowLeftRight className="h-4 w-4 text-primary md:rotate-90" />
+              </Button>
+            </motion.div>
+          </div>
+
+          {/* TO: currency selector + result */}
+          {showOfflinePaywall ? (
+            <OfflinePaywall lang={lang} onUpgrade={handleUpgrade} />
+          ) : (
+            <motion.div
+              layout
+              transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              className="glass-card bg-card border border-border rounded-2xl p-4 space-y-2 md:flex-1"
+            >
+              <button
+                onClick={() => setPickerTarget("to")}
+                className="w-full flex items-center gap-3 text-left group press-effect"
+              >
+                <motion.div key={toCurrency} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 500, damping: 25 }}>
+                  <FlagIcon currencyCode={toCurrency} size={36} />
+                </motion.div>
+                <div className="flex-1 min-w-0">
+                  <motion.div key={toCurrency + "-name"} initial={{ x: -8, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="font-display font-bold text-base text-foreground leading-tight">{toCurrency}</motion.div>
+                  <div className="text-xs text-muted-foreground truncate">{getCurrencyName(toCurrency, lang)}</div>
+                </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+              </button>
+              <div className="bg-muted/50 border border-border rounded-xl px-4 py-3 min-h-[60px] flex items-center">
+                <AnimatePresence mode="wait">
+                  {result !== null ? (
+                    <motion.span
+                      key={result}
+                      initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
+                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                      exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                      className="text-3xl font-display font-bold text-foreground tracking-tight"
+                    >
+                      {formatResult(result)}
+                    </motion.span>
+                  ) : (
+                    <span className="text-3xl font-display font-bold text-muted-foreground/30">—</span>
+                  )}
+                </AnimatePresence>
+              </div>
+              {rate !== null && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.1 }}
+                  className="text-xs text-muted-foreground flex items-center gap-1"
+                >
+                  <FlagIcon currencyCode={fromCurrency} size={14} /> 1 {fromCurrency} = {formatResult(rate)} {toCurrency} <FlagIcon currencyCode={toCurrency} size={14} />
+                </motion.div>
+              )}
+              {!isOnline && isPro && (
+                <Badge variant="secondary" className="text-[10px]">{t(lang, "offlineRates")}</Badge>
+              )}
+            </motion.div>
+          )}
+        </div>
 
         {/* Favorites / Quick currencies */}
-        <div className="flex gap-1.5 items-center">
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="flex gap-1.5 items-center"
+        >
           <div className="flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-hide items-center flex-1 min-w-0">
-            {favorites.map((code) => {
+            {favorites.map((code, i) => {
               const info = getCurrencyInfo(code);
               if (!info) return null;
               const isActive = code === fromCurrency || code === toCurrency;
               return (
                 <motion.button
                   key={code}
-                  whileTap={{ scale: 0.93 }}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.03, type: "spring", stiffness: 500, damping: 25 }}
+                  whileTap={{ scale: 0.9 }}
+                  whileHover={{ scale: 1.05 }}
                   onClick={() => handleFavoriteTap(code)}
-                  className={`flex-shrink-0 flex items-center gap-1.5 pl-1.5 pr-2.5 py-1 rounded-full text-xs font-semibold transition-all
+                  className={`flex-shrink-0 flex items-center gap-1.5 pl-1.5 pr-2.5 py-1 rounded-full text-xs font-semibold transition-all duration-200
                     ${isActive
-                      ? "bg-primary text-primary-foreground shadow-sm"
+                      ? "bg-primary text-primary-foreground shadow-md"
                       : "bg-card border border-border text-foreground hover:border-primary/30"
                     }`}
                 >
@@ -380,14 +412,15 @@ const Index = () => {
             })}
           </div>
           <motion.button
-            whileTap={{ scale: 0.93 }}
+            whileTap={{ scale: 0.9, rotate: 15 }}
+            whileHover={{ scale: 1.1 }}
             onClick={() => setShowFavManager(true)}
-            className="flex-shrink-0 flex items-center justify-center h-7 w-7 rounded-full border border-dashed border-border text-muted-foreground hover:border-primary/40 hover:text-primary transition-all"
+            className="flex-shrink-0 flex items-center justify-center h-7 w-7 rounded-full border border-dashed border-border text-muted-foreground hover:border-primary/40 hover:text-primary transition-all duration-200"
             aria-label="Edit favorites"
           >
             {favorites.length > 0 ? <Pencil className="h-3 w-3" /> : <Plus className="h-3.5 w-3.5" />}
           </motion.button>
-        </div>
+        </motion.div>
 
         {/* All rates – Pro only */}
         {isPro && rates && (
@@ -402,9 +435,14 @@ const Index = () => {
         )}
 
         {/* Status + refresh */}
-        <div className="flex items-center justify-between text-[11px] text-muted-foreground glass-card bg-card border border-border rounded-xl px-3 py-2">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="flex items-center justify-between text-[11px] text-muted-foreground glass-card bg-card border border-border rounded-xl px-3 py-2"
+        >
           <div className="flex items-center gap-2">
-            <span className={`flex items-center gap-1 font-medium ${isOnline ? "text-green-600 dark:text-green-400" : "text-destructive"}`}>
+            <span className={`flex items-center gap-1 font-medium ${isOnline ? "text-success" : "text-destructive"}`}>
               {isOnline ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
               {isOnline ? "Online" : "Offline"}
             </span>
@@ -416,12 +454,12 @@ const Index = () => {
             size="sm"
             onClick={refreshRates}
             disabled={!isOnline || fetchStatus === "loading"}
-            className="gap-1 text-[11px] h-7 px-2"
+            className="gap-1 text-[11px] h-7 px-2 hover:scale-105 active:scale-95 transition-transform"
           >
             <RefreshCw className={`h-3 w-3 ${fetchStatus === "loading" ? "animate-spin" : ""}`} />
             {fetchStatus === "loading" ? t(lang, "updating") : t(lang, "updateNow")}
           </Button>
-        </div>
+        </motion.div>
       </main>
 
       {pickerTarget && (
