@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeftRight, RefreshCw, History, Settings, Wifi, WifiOff, ChevronRight, Plane, Keyboard } from "lucide-react";
+import { ArrowLeftRight, RefreshCw, History, Settings, Wifi, WifiOff, ChevronRight, Plane, Keyboard, Pencil, Plus } from "lucide-react";
 import FlagIcon from "@/components/FlagIcon";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -34,7 +34,7 @@ const Index = () => {
   const [fromCurrency, setFromCurrency] = useState("NOK");
   const [toCurrency, setToCurrency] = useState("EUR");
   const [result, setResult] = useState<number | null>(null);
-  const [pickerTarget, setPickerTarget] = useState<"from" | "to" | null>(null);
+  const [pickerTarget, setPickerTarget] = useState<"from" | "to" | "favorites" | null>(null);
   const [view, setView] = useState<View>("converter");
   const [widgetConfig, setWidgetConfig] = useState<WidgetConfig>({ currency1: "NOK", currency2: "EUR" });
   const [showKeypad, setShowKeypad] = useState(false);
@@ -86,6 +86,10 @@ const Index = () => {
   const handleSwap = () => { setFromCurrency(toCurrency); setToCurrency(fromCurrency); };
   const handleQuickAmount = (val: number) => setAmount(val.toString());
   const handleCurrencySelect = (code: string) => {
+    if (pickerTarget === "favorites") {
+      toggleFavorite(code);
+      return; // Don't close picker — let user toggle multiple
+    }
     if (pickerTarget === "from") setFromCurrency(code);
     else if (pickerTarget === "to") setToCurrency(code);
     setPickerTarget(null);
@@ -349,31 +353,37 @@ const Index = () => {
           </motion.div>
         )}
 
-        {/* Favorites */}
-        {favorites.length > 0 && (
-          <div className="flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-hide">
-            {favorites.map((code) => {
-              const info = getCurrencyInfo(code);
-              if (!info) return null;
-              const isActive = code === fromCurrency || code === toCurrency;
-              return (
-                <motion.button
-                  key={code}
-                  whileTap={{ scale: 0.93 }}
-                  onClick={() => handleFavoriteTap(code)}
-                  className={`flex-shrink-0 flex items-center gap-1.5 pl-1.5 pr-2.5 py-1 rounded-full text-xs font-semibold transition-all
-                    ${isActive
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "bg-card border border-border text-foreground hover:border-primary/30"
-                    }`}
-                >
-                  <FlagIcon currencyCode={code} size={16} />
-                  <span>{code}</span>
-                </motion.button>
-              );
-            })}
-          </div>
-        )}
+        {/* Favorites / Quick currencies */}
+        <div className="flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-hide items-center">
+          {favorites.map((code) => {
+            const info = getCurrencyInfo(code);
+            if (!info) return null;
+            const isActive = code === fromCurrency || code === toCurrency;
+            return (
+              <motion.button
+                key={code}
+                whileTap={{ scale: 0.93 }}
+                onClick={() => handleFavoriteTap(code)}
+                className={`flex-shrink-0 flex items-center gap-1.5 pl-1.5 pr-2.5 py-1 rounded-full text-xs font-semibold transition-all
+                  ${isActive
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "bg-card border border-border text-foreground hover:border-primary/30"
+                  }`}
+              >
+                <FlagIcon currencyCode={code} size={16} />
+                <span>{code}</span>
+              </motion.button>
+            );
+          })}
+          <motion.button
+            whileTap={{ scale: 0.93 }}
+            onClick={() => setPickerTarget("favorites")}
+            className="flex-shrink-0 flex items-center justify-center h-7 w-7 rounded-full border border-dashed border-border text-muted-foreground hover:border-primary/40 hover:text-primary transition-all"
+            aria-label="Edit favorites"
+          >
+            {favorites.length > 0 ? <Pencil className="h-3 w-3" /> : <Plus className="h-3.5 w-3.5" />}
+          </motion.button>
+        </div>
 
         {/* All rates – Pro only */}
         {isPro && rates && (
@@ -414,7 +424,7 @@ const Index = () => {
         <CurrencyPicker
           lang={lang}
           favorites={favorites}
-          selected={pickerTarget === "from" ? fromCurrency : toCurrency}
+          selected={pickerTarget === "from" ? fromCurrency : pickerTarget === "to" ? toCurrency : ""}
           onSelect={handleCurrencySelect}
           onToggleFavorite={toggleFavorite}
           onClose={() => setPickerTarget(null)}
