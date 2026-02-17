@@ -1,11 +1,12 @@
 import React, { useState, useMemo } from "react";
-import { ChevronDown, ChevronUp, Crown, ChevronRight, Plus, X, ArrowRightLeft, WifiOff } from "lucide-react";
+import { ChevronDown, ChevronUp, Crown, ChevronRight, Plus, X, ArrowRightLeft, WifiOff, Search } from "lucide-react";
 import FlagIcon from "@/components/FlagIcon";
 import { currencies, COMMON_CURRENCY_CODES, getCurrencyName } from "@/lib/currencies";
 import { t, type Lang } from "@/lib/i18n";
 import { Badge } from "@/components/ui/badge";
 
 type Mode = "single" | "multi";
+type PickerFor = "base" | "target" | "addCompare" | "addBase" | null;
 
 interface AllRatesListProps {
   lang: Lang;
@@ -18,17 +19,96 @@ interface AllRatesListProps {
 const DEFAULT_COMPARE = ["EUR", "USD", "GBP", "SEK", "DKK"];
 const DEFAULT_BASES = ["NOK", "EUR", "USD"];
 
+/** Mini inline currency picker with search */
+function MiniPicker({ lang, exclude, onSelect, onClose }: {
+  lang: Lang;
+  exclude: string[];
+  onSelect: (code: string) => void;
+  onClose: () => void;
+}) {
+  const [search, setSearch] = useState("");
+
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase();
+    return currencies
+      .filter((c) => !exclude.includes(c.code))
+      .filter((c) =>
+        !q ||
+        c.code.toLowerCase().includes(q) ||
+        c.name.toLowerCase().includes(q) ||
+        c.nameNb.toLowerCase().includes(q)
+      )
+      .slice(0, 30);
+  }, [search, exclude]);
+
+  const common = useMemo(
+    () => COMMON_CURRENCY_CODES.filter((c) => !exclude.includes(c)),
+    [exclude]
+  );
+
+  return (
+    <div className="border-t border-border/50 bg-muted/20">
+      <div className="px-3 py-2 flex items-center gap-2">
+        <Search className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+        <input
+          autoFocus
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder={t(lang, "search")}
+          className="flex-1 bg-transparent text-xs text-foreground placeholder:text-muted-foreground/50 focus:outline-none"
+        />
+        <button onClick={onClose} className="p-1 rounded-full hover:bg-muted transition-colors">
+          <X className="h-3 w-3 text-muted-foreground" />
+        </button>
+      </div>
+      {!search && (
+        <div className="px-3 pb-1.5 flex gap-1.5 flex-wrap">
+          {common.slice(0, 10).map((code) => (
+            <button
+              key={code}
+              onClick={() => onSelect(code)}
+              className="flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-semibold bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary transition-all"
+            >
+              <FlagIcon currencyCode={code} size={14} />
+              {code}
+            </button>
+          ))}
+        </div>
+      )}
+      {search && (
+        <div className="max-h-[30vh] overflow-y-auto divide-y divide-border/50">
+          {filtered.map((c) => (
+            <button
+              key={c.code}
+              onClick={() => onSelect(c.code)}
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-muted/40 transition-colors"
+            >
+              <FlagIcon currencyCode={c.code} size={18} />
+              <span className="text-[11px] font-semibold text-foreground">{c.code}</span>
+              <span className="text-[10px] text-muted-foreground truncate">{getCurrencyName(c.code, lang)}</span>
+            </button>
+          ))}
+          {filtered.length === 0 && (
+            <div className="px-3 py-4 text-center text-[11px] text-muted-foreground">
+              {lang === "nb" ? "Ingen resultater" : "No results"}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function AllRatesList({ lang, fromCurrency, getRate, formatResult, isOnline }: AllRatesListProps) {
   const [expanded, setExpanded] = useState(false);
   const [mode, setMode] = useState<Mode>("single");
+  const [pickerFor, setPickerFor] = useState<PickerFor>(null);
 
   // Single mode state
   const [baseCurrency, setBaseCurrency] = useState(fromCurrency);
-  const [showBasePicker, setShowBasePicker] = useState(false);
   const [compareCurrencies, setCompareCurrencies] = useState<string[]>(() =>
     DEFAULT_COMPARE.filter((c) => c !== fromCurrency)
   );
-  const [showAddPicker, setShowAddPicker] = useState(false);
   const [showAll, setShowAll] = useState(false);
 
   // Multi mode state
@@ -36,14 +116,35 @@ export default function AllRatesList({ lang, fromCurrency, getRate, formatResult
     DEFAULT_BASES.filter((c) => c !== fromCurrency).slice(0, 3)
   );
   const [targetCurrency, setTargetCurrency] = useState(fromCurrency);
-  const [showTargetPicker, setShowTargetPicker] = useState(false);
-  const [showAddBase, setShowAddBase] = useState(false);
 
   React.useEffect(() => {
     setBaseCurrency(fromCurrency);
     setTargetCurrency(fromCurrency);
     setCompareCurrencies((prev) => prev.filter((c) => c !== fromCurrency));
   }, [fromCurrency]);
+
+  const closePicker = () => setPickerFor(null);
+
+  const handlePickerSelect = (code: string) => {
+    if (pickerFor === "base") {
+      setBaseCurrency(code);
+    } else if (pickerFor === "target") {
+      setTargetCurrency(code);
+    } else if (pickerFor === "addCompare") {
+      setCompareCurrencies((prev) => [...prev, code]);
+    } else if (pickerFor === "addBase") {
+      setBaseCurrenciesMulti((prev) => [...prev, code]);
+    }
+    setPickerFor(null);
+  };
+
+  const pickerExclude = useMemo(() => {
+    if (pickerFor === "base") return [baseCurrency];
+    if (pickerFor === "target") return [...baseCurrenciesMulti];
+    if (pickerFor === "addCompare") return [baseCurrency, ...compareCurrencies];
+    if (pickerFor === "addBase") return [targetCurrency, ...baseCurrenciesMulti];
+    return [];
+  }, [pickerFor, baseCurrency, compareCurrencies, baseCurrenciesMulti, targetCurrency]);
 
   // Single mode data
   const selectedRates = useMemo(() => {
@@ -68,35 +169,11 @@ export default function AllRatesList({ lang, fromCurrency, getRate, formatResult
       .filter((r) => r.rate !== null);
   }, [baseCurrenciesMulti, targetCurrency, getRate]);
 
-  const quickBaseCurrencies = useMemo(
-    () => COMMON_CURRENCY_CODES.filter((c) => c !== baseCurrency).slice(0, 8),
-    [baseCurrency]
-  );
-
-  const addableCurrencies = useMemo(
-    () => COMMON_CURRENCY_CODES.filter((c) => c !== baseCurrency && !compareCurrencies.includes(c)),
-    [baseCurrency, compareCurrencies]
-  );
-
-  const addableBasesMulti = useMemo(
-    () => COMMON_CURRENCY_CODES.filter((c) => c !== targetCurrency && !baseCurrenciesMulti.includes(c)),
-    [targetCurrency, baseCurrenciesMulti]
-  );
-
-  const quickTargets = useMemo(
-    () => COMMON_CURRENCY_CODES.filter((c) => !baseCurrenciesMulti.includes(c)).slice(0, 8),
-    [baseCurrenciesMulti]
-  );
-
   const toggleCompare = (code: string) => {
     setCompareCurrencies((prev) =>
       prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]
     );
   };
-
-  const modeLabel = mode === "single"
-    ? (lang === "nb" ? "Enkeltvaluta" : "Single")
-    : (lang === "nb" ? "Sammenlign flere" : "Multi-compare");
 
   return (
     <div className="bg-card border border-border rounded-2xl overflow-hidden">
@@ -111,11 +188,7 @@ export default function AllRatesList({ lang, fromCurrency, getRate, formatResult
           </span>
           <span className="text-[10px] font-bold bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">PRO</span>
         </div>
-        {expanded ? (
-          <ChevronUp className="h-4 w-4 text-muted-foreground" />
-        ) : (
-          <ChevronDown className="h-4 w-4 text-muted-foreground" />
-        )}
+        {expanded ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
       </button>
 
       {expanded && (
@@ -124,18 +197,14 @@ export default function AllRatesList({ lang, fromCurrency, getRate, formatResult
           <div className="flex items-center justify-between px-4 py-2 border-b border-border/50 bg-muted/30">
             <div className="flex gap-1">
               <button
-                onClick={() => setMode("single")}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all ${
-                  mode === "single" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
-                }`}
+                onClick={() => { setMode("single"); closePicker(); }}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all ${mode === "single" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"}`}
               >
                 {lang === "nb" ? "Enkeltvaluta" : "Single base"}
               </button>
               <button
-                onClick={() => setMode("multi")}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1 ${
-                  mode === "multi" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
-                }`}
+                onClick={() => { setMode("multi"); closePicker(); }}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1 ${mode === "multi" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"}`}
               >
                 <ArrowRightLeft className="h-3 w-3" />
                 {lang === "nb" ? "Sammenlign" : "Compare"}
@@ -152,31 +221,20 @@ export default function AllRatesList({ lang, fromCurrency, getRate, formatResult
           {mode === "single" ? (
             <>
               {/* Base currency selector */}
-              <div className="px-4 py-2.5 border-b border-border/50 space-y-2">
+              <div className="px-4 py-2.5 border-b border-border/50">
                 <button
-                  onClick={() => { setShowBasePicker(!showBasePicker); setShowAddPicker(false); }}
+                  onClick={() => setPickerFor(pickerFor === "base" ? null : "base")}
                   className="flex items-center gap-2 group"
                 >
                   <FlagIcon currencyCode={baseCurrency} size={22} />
                   <span className="text-sm font-bold text-foreground">{baseCurrency}</span>
                   <span className="text-xs text-muted-foreground">{getCurrencyName(baseCurrency, lang)}</span>
-                  <ChevronRight className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${showBasePicker ? "rotate-90" : ""}`} />
+                  <ChevronRight className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${pickerFor === "base" ? "rotate-90" : ""}`} />
                 </button>
-                {showBasePicker && (
-                  <div className="flex gap-1.5 flex-wrap">
-                    {quickBaseCurrencies.map((code) => (
-                      <button
-                        key={code}
-                        onClick={() => { setBaseCurrency(code); setShowBasePicker(false); }}
-                        className="flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-semibold transition-all bg-muted text-muted-foreground hover:bg-muted/80"
-                      >
-                        <FlagIcon currencyCode={code} size={14} />
-                        {code}
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
+              {pickerFor === "base" && (
+                <MiniPicker lang={lang} exclude={pickerExclude} onSelect={handlePickerSelect} onClose={closePicker} />
+              )}
 
               {/* Selected comparison currencies */}
               <div className="divide-y divide-border/50">
@@ -196,29 +254,18 @@ export default function AllRatesList({ lang, fromCurrency, getRate, formatResult
               </div>
 
               {/* Add currency */}
-              <div className="px-4 py-2.5 border-t border-border/50 space-y-2">
+              <div className="px-4 py-2.5 border-t border-border/50">
                 <button
-                  onClick={() => { setShowAddPicker(!showAddPicker); setShowBasePicker(false); }}
+                  onClick={() => setPickerFor(pickerFor === "addCompare" ? null : "addCompare")}
                   className="flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80 transition-colors"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   {lang === "nb" ? "Legg til valuta" : "Add currency"}
                 </button>
-                {showAddPicker && (
-                  <div className="flex gap-1.5 flex-wrap">
-                    {addableCurrencies.map((code) => (
-                      <button
-                        key={code}
-                        onClick={() => { toggleCompare(code); setShowAddPicker(false); }}
-                        className="flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-semibold transition-all bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
-                      >
-                        <FlagIcon currencyCode={code} size={14} />
-                        {code}
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
+              {pickerFor === "addCompare" && (
+                <MiniPicker lang={lang} exclude={pickerExclude} onSelect={handlePickerSelect} onClose={closePicker} />
+              )}
 
               {/* Show all toggle */}
               <div className="border-t border-border/50">
@@ -248,34 +295,23 @@ export default function AllRatesList({ lang, fromCurrency, getRate, formatResult
           ) : (
             <>
               {/* Multi mode: target currency selector */}
-              <div className="px-4 py-2.5 border-b border-border/50 space-y-2">
+              <div className="px-4 py-2.5 border-b border-border/50">
                 <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">
                   {lang === "nb" ? "Målvaluta" : "Target currency"}
                 </div>
                 <button
-                  onClick={() => { setShowTargetPicker(!showTargetPicker); setShowAddBase(false); }}
+                  onClick={() => setPickerFor(pickerFor === "target" ? null : "target")}
                   className="flex items-center gap-2 group"
                 >
                   <FlagIcon currencyCode={targetCurrency} size={22} />
                   <span className="text-sm font-bold text-foreground">{targetCurrency}</span>
                   <span className="text-xs text-muted-foreground">{getCurrencyName(targetCurrency, lang)}</span>
-                  <ChevronRight className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${showTargetPicker ? "rotate-90" : ""}`} />
+                  <ChevronRight className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${pickerFor === "target" ? "rotate-90" : ""}`} />
                 </button>
-                {showTargetPicker && (
-                  <div className="flex gap-1.5 flex-wrap">
-                    {quickTargets.map((code) => (
-                      <button
-                        key={code}
-                        onClick={() => { setTargetCurrency(code); setShowTargetPicker(false); }}
-                        className="flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-semibold transition-all bg-muted text-muted-foreground hover:bg-muted/80"
-                      >
-                        <FlagIcon currencyCode={code} size={14} />
-                        {code}
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
+              {pickerFor === "target" && (
+                <MiniPicker lang={lang} exclude={pickerExclude} onSelect={handlePickerSelect} onClose={closePicker} />
+              )}
 
               {/* Multi base comparison list */}
               <div className="divide-y divide-border/50">
@@ -292,9 +328,7 @@ export default function AllRatesList({ lang, fromCurrency, getRate, formatResult
                       <div className="text-[11px] text-muted-foreground">{getCurrencyName(code, lang)}</div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-mono font-bold text-foreground tabular-nums">
-                        {formatResult(rate!)}
-                      </div>
+                      <div className="text-sm font-mono font-bold text-foreground tabular-nums">{formatResult(rate!)}</div>
                       <div className="text-[10px] text-muted-foreground">{targetCurrency}</div>
                     </div>
                     <button
@@ -309,32 +343,18 @@ export default function AllRatesList({ lang, fromCurrency, getRate, formatResult
               </div>
 
               {/* Add base currency */}
-              <div className="px-4 py-2.5 border-t border-border/50 space-y-2">
+              <div className="px-4 py-2.5 border-t border-border/50">
                 <button
-                  onClick={() => { setShowAddBase(!showAddBase); setShowTargetPicker(false); }}
+                  onClick={() => setPickerFor(pickerFor === "addBase" ? null : "addBase")}
                   className="flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80 transition-colors"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   {lang === "nb" ? "Legg til valuta å sammenligne" : "Add currency to compare"}
                 </button>
-                {showAddBase && (
-                  <div className="flex gap-1.5 flex-wrap">
-                    {addableBasesMulti.map((code) => (
-                      <button
-                        key={code}
-                        onClick={() => {
-                          setBaseCurrenciesMulti((prev) => [...prev, code]);
-                          setShowAddBase(false);
-                        }}
-                        className="flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-semibold transition-all bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
-                      >
-                        <FlagIcon currencyCode={code} size={14} />
-                        {code}
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
+              {pickerFor === "addBase" && (
+                <MiniPicker lang={lang} exclude={pickerExclude} onSelect={handlePickerSelect} onClose={closePicker} />
+              )}
             </>
           )}
         </div>

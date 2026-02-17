@@ -79,7 +79,7 @@ const translations = {
     everyHour: "hver time",
     everyHours: "hver {h}. time",
     allRates: "Alle kurser",
-    allRatesFrom: "Kurser fra {currency}",
+    allRatesFrom: "Valutakurser fra {currency}",
     proFeature: "Pro-funksjon",
   },
   en: {
