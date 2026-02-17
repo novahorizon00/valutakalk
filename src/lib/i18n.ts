@@ -81,6 +81,12 @@ const translations = {
     allRates: "Alle kurser",
     allRatesFrom: "Valutakurser fra {currency}",
     proFeature: "Pro-funksjon",
+    darkMode: "Mørk modus",
+    lightMode: "Lys modus",
+    systemMode: "System",
+    theme: "Utseende",
+    widgetSetup: "Widget-oppsett",
+    widgetDescription: "Legg til valuta-widget på hjemskjermen",
   },
   en: {
     appName: "Offline FX",
@@ -162,6 +168,12 @@ const translations = {
     allRates: "All rates",
     allRatesFrom: "Rates from {currency}",
     proFeature: "Pro feature",
+    darkMode: "Dark mode",
+    lightMode: "Light mode",
+    systemMode: "System",
+    theme: "Appearance",
+    widgetSetup: "Widget Setup",
+    widgetDescription: "Add currency widget to home screen",
   },
 } as const;
 

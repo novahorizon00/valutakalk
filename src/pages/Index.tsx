@@ -13,8 +13,9 @@ import HistoryView from "@/components/HistoryView";
 import SettingsView from "@/components/SettingsView";
 import OfflinePaywall from "@/components/OfflinePaywall";
 import AllRatesList from "@/components/AllRatesList";
+import WidgetSetup, { type WidgetConfig } from "@/components/WidgetSetup";
 
-type View = "converter" | "history" | "settings";
+type View = "converter" | "history" | "settings" | "widget";
 
 const Index = () => {
   const {
@@ -30,6 +31,7 @@ const Index = () => {
   const [result, setResult] = useState<number | null>(null);
   const [pickerTarget, setPickerTarget] = useState<"from" | "to" | null>(null);
   const [view, setView] = useState<View>("converter");
+  const [widgetConfig, setWidgetConfig] = useState<WidgetConfig>({ currency1: "NOK", currency2: "EUR" });
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   const lang: Lang = settings?.language ?? "nb";
@@ -115,7 +117,8 @@ const Index = () => {
   }
 
   if (view === "history") return <HistoryView history={history} lang={lang} onBack={() => setView("converter")} onClear={clearAllHistory} />;
-  if (view === "settings") return <SettingsView settings={settings} lang={lang} fetchStatus={fetchStatus} lastError={lastError} rates={rates} proStatus={proStatus} onBack={() => setView("converter")} onUpdate={updateSettings} onUpgrade={handleUpgrade} />;
+  if (view === "settings") return <SettingsView settings={settings} lang={lang} fetchStatus={fetchStatus} lastError={lastError} rates={rates} proStatus={proStatus} onBack={() => setView("converter")} onUpdate={updateSettings} onUpgrade={handleUpgrade} onOpenWidget={() => setView("widget")} />;
+  if (view === "widget") return <WidgetSetup lang={lang} config={widgetConfig} onSave={setWidgetConfig} onBack={() => setView("settings")} />;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -297,6 +300,7 @@ const Index = () => {
             getRate={getRate}
             formatResult={formatResult}
             isOnline={isOnline}
+            onQuickSetTarget={(code) => setToCurrency(code)}
           />
         )}
 

@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { ArrowLeft, Globe, Crown } from "lucide-react";
+import { ArrowLeft, Globe, Crown, Sun, Moon, Monitor, Smartphone } from "lucide-react";
+import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { t, type Lang } from "@/lib/i18n";
 import { getRatesAge } from "@/lib/rateService";
 import type { UserSettings, CachedRates } from "@/lib/storage";
@@ -21,12 +22,14 @@ interface SettingsViewProps {
   onBack: () => void;
   onUpdate: (partial: Partial<UserSettings>) => void;
   onUpgrade: () => void;
+  onOpenWidget: () => void;
 }
 
 export default function SettingsView({
-  settings, lang, fetchStatus, lastError, rates, proStatus, onBack, onUpdate, onUpgrade,
+  settings, lang, fetchStatus, lastError, rates, proStatus, onBack, onUpdate, onUpgrade, onOpenWidget,
 }: SettingsViewProps) {
   const [chipsInput, setChipsInput] = useState(settings.quickAmounts.join(", "));
+  const { theme, setTheme } = useTheme();
 
   const saveChips = () => {
     const parsed = chipsInput.split(/[,\s]+/).map(Number).filter((n) => !isNaN(n) && n > 0).slice(0, 10);
@@ -45,6 +48,12 @@ export default function SettingsView({
     if (!proStatus.expiresAt) return "";
     return new Date(proStatus.expiresAt).toLocaleDateString(lang === "nb" ? "nb-NO" : "en-US", { year: "numeric", month: "short", day: "numeric" });
   };
+
+  const themeOptions = [
+    { value: "light", icon: Sun, label: t(lang, "lightMode") },
+    { value: "dark", icon: Moon, label: t(lang, "darkMode") },
+    { value: "system", icon: Monitor, label: t(lang, "systemMode") },
+  ];
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -89,6 +98,50 @@ export default function SettingsView({
             </CardContent>
           )}
         </Card>
+
+        {/* Theme / Dark mode */}
+        <Card>
+          <CardContent className="pt-5 pb-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <Sun className="h-4 w-4 text-muted-foreground" />
+              <span className="font-semibold text-sm">{t(lang, "theme")}</span>
+            </div>
+            <div className="flex gap-1.5">
+              {themeOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setTheme(opt.value)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all
+                    ${theme === opt.value
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    }`}
+                >
+                  <opt.icon className="h-3.5 w-3.5" />
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Widget setup – Pro only */}
+        {proStatus.isActive && (
+          <Card className="cursor-pointer hover:border-primary/30 transition-colors" onClick={onOpenWidget}>
+            <CardContent className="pt-5 pb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Smartphone className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <span className="font-semibold text-sm block">{t(lang, "widgetSetup")}</span>
+                    <span className="text-xs text-muted-foreground">{t(lang, "widgetDescription")}</span>
+                  </div>
+                </div>
+                <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px] font-bold">PRO</Badge>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Language */}
         <Card>
