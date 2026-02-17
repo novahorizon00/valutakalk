@@ -238,6 +238,8 @@ export default function SettingsView({
             <p className="text-xs text-muted-foreground">{t(lang, "privacyText")}</p>
           </CardContent>
         </Card>
+
+        <p className="text-center text-[10px] text-muted-foreground/50 pb-2">🇳🇴 {lang === "nb" ? "Utviklet i Norge" : "Developed in Norway"}</p>
       </div>
     </div>
   );
