@@ -11,14 +11,14 @@ interface OnboardingGuideProps {
 
 const steps = {
   nb: [
-    { icon: Globe, title: "Velkommen til Offline FX", desc: "Konverter 170+ valutaer raskt og enkelt – designet for reisende." },
-    { icon: WifiOff, title: "Fungerer offline", desc: "Kursene lagres lokalt, slik at du kan konvertere uten internett." },
-    { icon: Star, title: "Sett opp favoritter", desc: "Trykk på stjerne-ikonet for å legge til valutaer du bruker ofte." },
+    { icon: Globe, title: "Velkommen til Valutakalkulator Pro", desc: "Takk for at du oppgraderte! Her er en rask oversikt over Pro-funksjonene dine." },
+    { icon: WifiOff, title: "Offline-modus", desc: "Kursene lagres lokalt, slik at du kan konvertere uten internett – selv på flyet." },
+    { icon: Star, title: "Valutakurser og historikk", desc: "Se alle kurser, sammenlign valutaer og følg trender med interaktive grafer." },
   ],
   en: [
-    { icon: Globe, title: "Welcome to Offline FX", desc: "Convert 170+ currencies quickly and easily – designed for travelers." },
-    { icon: WifiOff, title: "Works offline", desc: "Rates are stored locally so you can convert without internet." },
-    { icon: Star, title: "Set up favorites", desc: "Tap the star icon to add currencies you use often." },
+    { icon: Globe, title: "Welcome to Currency Calculator Pro", desc: "Thanks for upgrading! Here's a quick overview of your Pro features." },
+    { icon: WifiOff, title: "Offline mode", desc: "Rates are stored locally so you can convert without internet – even on the plane." },
+    { icon: Star, title: "Rates & history", desc: "View all rates, compare currencies and track trends with interactive charts." },
   ],
 };
 
