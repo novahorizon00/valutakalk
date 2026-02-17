@@ -129,22 +129,26 @@ const Index = () => {
         </button>
       )}
 
-      {/* Header with gradient */}
+      {/* Simple header */}
       <header className="gradient-primary px-5 pt-4 pb-5 text-primary-foreground">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2.5">
-            <h1 className="font-display text-2xl font-bold tracking-tight">Offline FX</h1>
-            {isPro && (
-              <span className="text-[10px] font-bold bg-primary-foreground/20 backdrop-blur-sm px-2 py-0.5 rounded-full">
-                PRO
+          <div>
+            <h1 className="font-display text-xl font-bold tracking-tight">
+              {t(lang, "currencyCalculator")}
+            </h1>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className={`flex items-center gap-1 text-[11px] font-medium ${isOnline ? "text-primary-foreground/60" : "text-destructive-foreground"}`}>
+                {isOnline ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
+                {isOnline ? t(lang, "online") : t(lang, "offline")}
               </span>
-            )}
+              {isPro && (
+                <span className="text-[10px] font-bold bg-primary-foreground/20 backdrop-blur-sm px-2 py-0.5 rounded-full">
+                  PRO
+                </span>
+              )}
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <span className={`flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${isOnline ? "bg-primary-foreground/15" : "bg-destructive/80 text-destructive-foreground"}`}>
-              {isOnline ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
-              {isOnline ? t(lang, "online") : t(lang, "offline")}
-            </span>
+          <div className="flex items-center gap-0.5">
             <Button variant="ghost" size="icon" onClick={() => setView("history")} className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10 h-9 w-9">
               <History className="h-[18px] w-[18px]" />
             </Button>
