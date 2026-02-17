@@ -14,6 +14,7 @@ export interface UserSettings {
   targetCurrency: string;
   quickAmounts: number[];
   autoUpdateWifiOnly: boolean;
+  autoRefreshMinutes: number; // 0 = disabled
   language: "nb" | "en";
 }
 
@@ -32,6 +33,7 @@ const DEFAULT_SETTINGS: UserSettings = {
   targetCurrency: "EUR",
   quickAmounts: [10, 25, 50, 100, 500],
   autoUpdateWifiOnly: false,
+  autoRefreshMinutes: 60,
   language: "nb",
 };
 

@@ -72,6 +72,12 @@ const translations = {
     connectToConvert: "Koble til internett for å konvertere",
     offlineBannerTitle: "Du bruker offline-kurser",
     offlineBannerDesc: "Valutakursene er lagret lokalt og kan være utdaterte. Koble til internett for å oppdatere.",
+    autoRefresh: "Auto-oppdatering",
+    autoRefreshOff: "Av",
+    autoRefreshInterval: "Oppdater hvert",
+    everyMinutes: "hvert {min} min",
+    everyHour: "hver time",
+    everyHours: "hver {h}. time",
   },
   en: {
     appName: "Offline FX",
@@ -144,6 +150,12 @@ const translations = {
     connectToConvert: "Connect to internet to convert",
     offlineBannerTitle: "Using offline rates",
     offlineBannerDesc: "Exchange rates are stored locally and may be outdated. Connect to internet to refresh.",
+    autoRefresh: "Auto-refresh",
+    autoRefreshOff: "Off",
+    autoRefreshInterval: "Refresh every",
+    everyMinutes: "every {min} min",
+    everyHour: "every hour",
+    everyHours: "every {h} hours",
   },
 } as const;
 

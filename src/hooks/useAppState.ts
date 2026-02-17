@@ -68,6 +68,19 @@ export function useAppState() {
     }
   }, []);
 
+  // Auto-refresh interval
+  useEffect(() => {
+    if (!settings || !isOnline) return;
+    const mins = settings.autoRefreshMinutes;
+    if (!mins || mins <= 0) return;
+
+    const id = setInterval(() => {
+      refreshRates();
+    }, mins * 60_000);
+
+    return () => clearInterval(id);
+  }, [settings?.autoRefreshMinutes, isOnline, refreshRates]);
+
   const updateSettings = useCallback(async (partial: Partial<UserSettings>) => {
     setSettingsState((prev) => {
       const updated = { ...prev!, ...partial };
