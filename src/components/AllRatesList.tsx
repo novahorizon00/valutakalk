@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import HistoryChart from "@/components/HistoryChart";
 
 type Mode = "single" | "multi" | "history";
-type PickerFor = "base" | "target" | "addCompare" | "addBase" | "historyTarget" | null;
+type PickerFor = "base" | "target" | "addCompare" | "addBase" | "historyTarget" | "historyBase" | null;
 
 interface AllRatesListProps {
   lang: Lang;
@@ -142,6 +142,8 @@ export default function AllRatesList({ lang, fromCurrency, getRate, formatResult
       setBaseCurrenciesMulti((prev) => [...prev, code]);
     } else if (pickerFor === "historyTarget") {
       setHistoryTarget(code);
+    } else if (pickerFor === "historyBase") {
+      setBaseCurrency(code);
     }
     setPickerFor(null);
   };
@@ -152,6 +154,7 @@ export default function AllRatesList({ lang, fromCurrency, getRate, formatResult
     if (pickerFor === "addCompare") return [baseCurrency, ...compareCurrencies];
     if (pickerFor === "addBase") return [targetCurrency, ...baseCurrenciesMulti];
     if (pickerFor === "historyTarget") return [baseCurrency, ...historyCompare];
+    if (pickerFor === "historyBase") return [historyTarget, ...historyCompare];
     return [];
   }, [pickerFor, baseCurrency, compareCurrencies, baseCurrenciesMulti, targetCurrency, historyCompare]);
 
@@ -380,11 +383,26 @@ export default function AllRatesList({ lang, fromCurrency, getRate, formatResult
             </>
           ) : mode === "history" ? (
             <>
-              {/* History mode: target currency selector */}
+              {/* History mode: base + target currency selectors */}
+              <div className="px-4 py-2.5 border-b border-border/50 space-y-2">
+                {/* Base currency (clickable) */}
+                <button
+                  onClick={() => setPickerFor(pickerFor === "historyBase" ? null : "historyBase")}
+                  className="flex items-center gap-2 group"
+                >
+                  <FlagIcon currencyCode={baseCurrency} size={20} />
+                  <span className="text-sm font-bold text-foreground">{baseCurrency}</span>
+                  <span className="text-xs text-muted-foreground">{getCurrencyName(baseCurrency, lang)}</span>
+                  <span className="text-xs text-muted-foreground mx-1">→</span>
+                  <ChevronRight className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${pickerFor === "historyBase" ? "rotate-90" : ""}`} />
+                </button>
+              </div>
+              {pickerFor === "historyBase" && (
+                <MiniPicker lang={lang} exclude={pickerExclude} onSelect={handlePickerSelect} onClose={closePicker} />
+              )}
+
+              {/* Target currency */}
               <div className="px-4 py-2.5 border-b border-border/50">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">
-                  {lang === "nb" ? `${baseCurrency} →` : `${baseCurrency} →`}
-                </div>
                 <button
                   onClick={() => setPickerFor(pickerFor === "historyTarget" ? null : "historyTarget")}
                   className="flex items-center gap-2 group"
@@ -392,7 +410,7 @@ export default function AllRatesList({ lang, fromCurrency, getRate, formatResult
                   <FlagIcon currencyCode={historyTarget} size={22} />
                   <span className="text-sm font-bold text-foreground">{historyTarget}</span>
                   <span className="text-xs text-muted-foreground">{getCurrencyName(historyTarget, lang)}</span>
-                  <ChevronRight className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${pickerFor === "historyTarget" ? "rotate-90" : ""}`} />
+                  <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${pickerFor === "historyTarget" ? "rotate-180" : ""}`} />
                 </button>
               </div>
               {pickerFor === "historyTarget" && (
