@@ -78,6 +78,9 @@ const translations = {
     everyMinutes: "hvert {min} min",
     everyHour: "hver time",
     everyHours: "hver {h}. time",
+    allRates: "Alle kurser",
+    allRatesFrom: "Kurser fra {currency}",
+    proFeature: "Pro-funksjon",
   },
   en: {
     appName: "Offline FX",
@@ -156,6 +159,9 @@ const translations = {
     everyMinutes: "every {min} min",
     everyHour: "every hour",
     everyHours: "every {h} hours",
+    allRates: "All rates",
+    allRatesFrom: "Rates from {currency}",
+    proFeature: "Pro feature",
   },
 } as const;
 
