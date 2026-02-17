@@ -13,6 +13,7 @@ import {
   type CachedRates,
 } from "@/lib/storage";
 import { fetchRates, getCrossRate, convert, areRatesStale, type FetchResult } from "@/lib/rateService";
+import { getProStatus, saveProStatus, canUseOffline, type ProSubscription } from "@/lib/proSubscription";
 import { useConnectivity } from "./useConnectivity";
 
 export type FetchStatus = "idle" | "loading" | "success" | "error";
@@ -25,19 +26,25 @@ export function useAppState() {
   const [rates, setRates] = useState<CachedRates | null>(null);
   const [fetchStatus, setFetchStatus] = useState<FetchStatus>("idle");
   const [lastError, setLastError] = useState<string | null>(null);
+  const [proStatus, setProStatus] = useState<ProSubscription>({ isActive: false });
   const initialized = useRef(false);
+
+  // Derived: can the user convert right now?
+  const isPro = proStatus.isActive;
+  const canConvertOffline = canUseOffline(proStatus);
 
   // Load persisted state
   useEffect(() => {
     if (initialized.current) return;
     initialized.current = true;
 
-    Promise.all([getSettings(), getFavorites(), getHistory(), getCachedRates()]).then(
-      ([s, f, h, r]) => {
+    Promise.all([getSettings(), getFavorites(), getHistory(), getCachedRates(), getProStatus()]).then(
+      ([s, f, h, r, p]) => {
         setSettingsState(s);
         setFavoritesState(f);
         setHistoryState(h);
         setRates(r);
+        setProStatus(p);
 
         // Auto-fetch if online and no rates or stale
         if (navigator.onLine && (!r || areRatesStale(r.timestamp))) {
@@ -121,6 +128,11 @@ export function useAppState() {
     [getRate]
   );
 
+  const updateProStatus = useCallback(async (status: ProSubscription) => {
+    await saveProStatus(status);
+    setProStatus(status);
+  }, []);
+
   return {
     settings,
     favorites,
@@ -129,6 +141,9 @@ export function useAppState() {
     isOnline,
     fetchStatus,
     lastError,
+    proStatus,
+    isPro,
+    canConvertOffline,
     refreshRates,
     updateSettings,
     toggleFavorite,
@@ -136,5 +151,6 @@ export function useAppState() {
     clearAllHistory,
     getRate,
     convertAmount,
+    updateProStatus,
   };
 }

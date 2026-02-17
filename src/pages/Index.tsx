@@ -1,15 +1,17 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { ArrowUpDown, RefreshCw, History, Settings, Globe, Wifi, WifiOff, ChevronRight } from "lucide-react";
+import { ArrowUpDown, RefreshCw, History, Settings, Wifi, WifiOff, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAppState } from "@/hooks/useAppState";
 import { t, type Lang } from "@/lib/i18n";
-import { getCurrencyInfo, getCurrencyName, COMMON_CURRENCY_CODES } from "@/lib/currencies";
+import { getCurrencyInfo } from "@/lib/currencies";
 import { areRatesStale, getRatesAge } from "@/lib/rateService";
+import { activateDevSubscription } from "@/lib/proSubscription";
 import CurrencyPicker from "@/components/CurrencyPicker";
 import HistoryView from "@/components/HistoryView";
 import SettingsView from "@/components/SettingsView";
+import OfflinePaywall from "@/components/OfflinePaywall";
 
 type View = "converter" | "history" | "settings";
 
@@ -18,6 +20,7 @@ const Index = () => {
     settings, favorites, history, rates, isOnline, fetchStatus,
     lastError, refreshRates, updateSettings, toggleFavorite,
     addConversion, clearAllHistory, getRate, convertAmount,
+    proStatus, isPro, canConvertOffline, updateProStatus,
   } = useAppState();
 
   const [amount, setAmount] = useState("100");
@@ -30,6 +33,9 @@ const Index = () => {
 
   const lang: Lang = settings?.language ?? "nb";
 
+  // Feature flag: should we show the offline paywall?
+  const showOfflinePaywall = !isOnline && !canConvertOffline;
+
   // Set currencies from settings on load
   useEffect(() => {
     if (settings) {
@@ -41,6 +47,13 @@ const Index = () => {
   // Debounced conversion
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    // If offline and not Pro, don't convert
+    if (!isOnline && !canConvertOffline) {
+      setResult(null);
+      return;
+    }
+
     debounceRef.current = setTimeout(() => {
       const num = parseFloat(amount);
       if (!isNaN(num) && num > 0) {
@@ -51,7 +64,7 @@ const Index = () => {
       }
     }, 150);
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [amount, fromCurrency, toCurrency, convertAmount]);
+  }, [amount, fromCurrency, toCurrency, convertAmount, isOnline, canConvertOffline]);
 
   // Save conversion to history on result change (debounced)
   const lastSavedRef = useRef("");
@@ -86,12 +99,18 @@ const Index = () => {
   };
 
   const handleFavoriteTap = (code: string) => {
-    // Set as "to" currency, or if it's already "to", set as "from"
     if (toCurrency === code) {
       setFromCurrency(code);
     } else {
       setToCurrency(code);
     }
+  };
+
+  const handleUpgrade = async () => {
+    // In production, this triggers Apple IAP / Google Play purchase flow
+    // via Capacitor plugin. For now, activate a dev subscription.
+    const status = await activateDevSubscription(7); // 7-day trial
+    updateProStatus(status);
   };
 
   const formatResult = (num: number): string => {
@@ -145,8 +164,10 @@ const Index = () => {
         fetchStatus={fetchStatus}
         lastError={lastError}
         rates={rates}
+        proStatus={proStatus}
         onBack={() => setView("converter")}
         onUpdate={updateSettings}
+        onUpgrade={handleUpgrade}
       />
     );
   }
@@ -155,9 +176,16 @@ const Index = () => {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="flex items-center justify-between px-4 py-3 border-b border-border">
-        <h1 className="font-display text-xl font-bold text-foreground tracking-tight">
-          Offline FX
-        </h1>
+        <div className="flex items-center gap-2">
+          <h1 className="font-display text-xl font-bold text-foreground tracking-tight">
+            Offline FX
+          </h1>
+          {isPro && (
+            <Badge className="bg-primary/15 text-primary border-primary/25 text-[10px] font-bold px-1.5 py-0">
+              PRO
+            </Badge>
+          )}
+        </div>
         <div className="flex items-center gap-2">
           <Badge
             variant="outline"
@@ -182,8 +210,8 @@ const Index = () => {
         </div>
       )}
 
-      {/* No rates warning */}
-      {!rates && (
+      {/* No rates warning (only when online — offline free users see paywall instead) */}
+      {!rates && isOnline && (
         <div className="bg-destructive/10 text-destructive px-4 py-3 text-sm text-center">
           {t(lang, "noRates")}
         </div>
@@ -247,7 +275,6 @@ const Index = () => {
 
         {/* Currency selectors + swap */}
         <div className="flex items-center gap-3">
-          {/* From */}
           <button
             onClick={() => setPickerTarget("from")}
             className="flex-1 flex items-center gap-3 bg-card border border-border rounded-xl px-4 py-3.5 hover:border-ring transition-colors text-left"
@@ -260,7 +287,6 @@ const Index = () => {
             <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground" />
           </button>
 
-          {/* Swap */}
           <Button
             variant="outline"
             size="icon"
@@ -271,7 +297,6 @@ const Index = () => {
             <ArrowUpDown className="h-5 w-5" />
           </Button>
 
-          {/* To */}
           <button
             onClick={() => setPickerTarget("to")}
             className="flex-1 flex items-center gap-3 bg-card border border-border rounded-xl px-4 py-3.5 hover:border-ring transition-colors text-left"
@@ -285,34 +310,43 @@ const Index = () => {
           </button>
         </div>
 
-        {/* Result */}
-        <Card className="p-5 bg-card border-border">
-          <div className="text-sm text-muted-foreground mb-1">{t(lang, "result")}</div>
-          <div className="text-4xl font-display font-bold text-foreground tracking-tight">
-            {result !== null ? (
-              <>
-                {formatResult(result)}{" "}
-                <span className="text-xl text-muted-foreground">{toCurrency}</span>
-              </>
-            ) : (
-              <span className="text-muted-foreground/50">—</span>
-            )}
-          </div>
-          {rate !== null && (
-            <div className="text-sm text-muted-foreground mt-2">
-              1 {fromCurrency} = {formatResult(rate)} {toCurrency}
-            </div>
-          )}
-        </Card>
+        {/* Offline paywall — shown instead of result when offline + free */}
+        {showOfflinePaywall ? (
+          <OfflinePaywall lang={lang} onUpgrade={handleUpgrade} />
+        ) : (
+          <>
+            {/* Result */}
+            <Card className="p-5 bg-card border-border">
+              <div className="text-sm text-muted-foreground mb-1">{t(lang, "result")}</div>
+              <div className="text-4xl font-display font-bold text-foreground tracking-tight">
+                {result !== null ? (
+                  <>
+                    {formatResult(result)}{" "}
+                    <span className="text-xl text-muted-foreground">{toCurrency}</span>
+                  </>
+                ) : (
+                  <span className="text-muted-foreground/50">—</span>
+                )}
+              </div>
+              {rate !== null && (
+                <div className="text-sm text-muted-foreground mt-2">
+                  1 {fromCurrency} = {formatResult(rate)} {toCurrency}
+                </div>
+              )}
+              {!isOnline && isPro && (
+                <div className="mt-2">
+                  <Badge variant="secondary" className="text-xs">
+                    {t(lang, "offlineRates")}
+                  </Badge>
+                </div>
+              )}
+            </Card>
+          </>
+        )}
 
         {/* Last updated + refresh */}
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center gap-1.5">
-            {!isOnline && rates && (
-              <Badge variant="secondary" className="text-xs mr-1">
-                {t(lang, "offlineRates")}
-              </Badge>
-            )}
             <span>{t(lang, "lastUpdated")}: {formatAge()}</span>
           </div>
           <Button
