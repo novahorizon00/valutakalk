@@ -38,7 +38,7 @@ const Index = () => {
   const [view, setView] = useState<View>("converter");
   const [widgetConfig, setWidgetConfig] = useState<WidgetConfig>({ currency1: "NOK", currency2: "EUR" });
   const [showKeypad, setShowKeypad] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem(ONBOARDING_KEY));
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   const lang: Lang = settings?.language ?? "nb";
@@ -50,6 +50,13 @@ const Index = () => {
       setToCurrency(settings.targetCurrency);
     }
   }, [settings?.baseCurrency, settings?.targetCurrency]);
+
+  // Show onboarding only for Pro users on first visit
+  useEffect(() => {
+    if (isPro && !localStorage.getItem(ONBOARDING_KEY)) {
+      setShowOnboarding(true);
+    }
+  }, [isPro]);
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
