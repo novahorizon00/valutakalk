@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ArrowLeftRight, RefreshCw, History, Settings, Wifi, WifiOff, ChevronRight, Plane } from "lucide-react";
+import FlagIcon from "@/components/FlagIcon";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAppState } from "@/hooks/useAppState";
@@ -179,9 +180,9 @@ const Index = () => {
             onClick={() => setPickerTarget("from")}
             className="w-full flex items-center gap-3 text-left group"
           >
-            <span className="text-3xl leading-none">{fromInfo?.flag}</span>
+            <FlagIcon currencyCode={fromCurrency} size={36} />
             <div className="flex-1 min-w-0">
-              <div className="font-display font-bold text-base text-foreground leading-tight flex items-center gap-1.5">{fromCurrency} <span className="text-sm">{fromInfo?.flag}</span></div>
+              <div className="font-display font-bold text-base text-foreground leading-tight">{fromCurrency}</div>
               <div className="text-xs text-muted-foreground truncate">{getCurrencyName(fromCurrency, lang)}</div>
             </div>
             <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
@@ -235,9 +236,9 @@ const Index = () => {
               onClick={() => setPickerTarget("to")}
               className="w-full flex items-center gap-3 text-left group"
             >
-              <span className="text-3xl leading-none">{toInfo?.flag}</span>
+              <FlagIcon currencyCode={toCurrency} size={36} />
               <div className="flex-1 min-w-0">
-                <div className="font-display font-bold text-base text-foreground leading-tight flex items-center gap-1.5">{toCurrency} <span className="text-sm">{toInfo?.flag}</span></div>
+                <div className="font-display font-bold text-base text-foreground leading-tight">{toCurrency}</div>
                 <div className="text-xs text-muted-foreground truncate">{getCurrencyName(toCurrency, lang)}</div>
               </div>
               <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
@@ -253,7 +254,7 @@ const Index = () => {
             </div>
             {rate !== null && (
               <div className="text-xs text-muted-foreground flex items-center gap-1">
-                <span>{fromInfo?.flag}</span> 1 {fromCurrency} = {formatResult(rate)} {toCurrency} <span>{toInfo?.flag}</span>
+                <FlagIcon currencyCode={fromCurrency} size={14} /> 1 {fromCurrency} = {formatResult(rate)} {toCurrency} <FlagIcon currencyCode={toCurrency} size={14} />
               </div>
             )}
             {!isOnline && isPro && (
@@ -279,7 +280,7 @@ const Index = () => {
                       : "bg-card border border-border text-foreground hover:border-primary/30"
                     }`}
                 >
-                  <span className="text-sm leading-none">{info.flag}</span>
+                  <FlagIcon currencyCode={code} size={16} />
                   <span>{code}</span>
                 </button>
               );
