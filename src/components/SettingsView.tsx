@@ -29,20 +29,13 @@ export default function SettingsView({
   const [chipsInput, setChipsInput] = useState(settings.quickAmounts.join(", "));
 
   const saveChips = () => {
-    const parsed = chipsInput
-      .split(/[,\s]+/)
-      .map(Number)
-      .filter((n) => !isNaN(n) && n > 0)
-      .slice(0, 10);
-    if (parsed.length > 0) {
-      onUpdate({ quickAmounts: parsed });
-    }
+    const parsed = chipsInput.split(/[,\s]+/).map(Number).filter((n) => !isNaN(n) && n > 0).slice(0, 10);
+    if (parsed.length > 0) onUpdate({ quickAmounts: parsed });
   };
 
   const formatAge = () => {
     if (!rates) return t(lang, "never");
-    const ageMs = getRatesAge(rates.timestamp);
-    const hrs = Math.floor(ageMs / 3_600_000);
+    const hrs = Math.floor(getRatesAge(rates.timestamp) / 3_600_000);
     if (hrs < 1) return `< 1 ${t(lang, "hours")}`;
     if (hrs < 24) return `${hrs} ${t(lang, "hours")}`;
     return `${Math.floor(hrs / 24)} ${t(lang, "days")}`;
@@ -50,162 +43,118 @@ export default function SettingsView({
 
   const formatExpiry = () => {
     if (!proStatus.expiresAt) return "";
-    return new Date(proStatus.expiresAt).toLocaleDateString(lang === "nb" ? "nb-NO" : "en-US", {
-      year: "numeric", month: "short", day: "numeric",
-    });
+    return new Date(proStatus.expiresAt).toLocaleDateString(lang === "nb" ? "nb-NO" : "en-US", { year: "numeric", month: "short", day: "numeric" });
   };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <header className="flex items-center gap-2 px-4 py-3 border-b border-border">
-        <Button variant="ghost" size="icon" onClick={onBack}>
+      <header className="gradient-primary px-4 py-3 flex items-center gap-2 text-primary-foreground">
+        <Button variant="ghost" size="icon" onClick={onBack} className="text-primary-foreground hover:bg-primary-foreground/10 h-9 w-9">
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <h1 className="font-display text-xl font-bold">{t(lang, "settings")}</h1>
       </header>
 
-      <div className="flex-1 overflow-y-auto px-4 py-5 max-w-lg mx-auto w-full space-y-4">
+      <div className="flex-1 overflow-y-auto px-4 py-5 max-w-lg mx-auto w-full space-y-3">
         {/* Subscription */}
-        <Card className={proStatus.isActive ? "border-primary/30 bg-primary/5" : ""}>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Crown className={`h-4 w-4 ${proStatus.isActive ? "text-primary" : "text-muted-foreground"}`} />
-              {t(lang, "subscription")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="font-medium text-foreground">
-                  {proStatus.isActive ? t(lang, "proUser") : t(lang, "freeUser")}
-                </div>
-                {proStatus.isActive && proStatus.expiresAt && (
-                  <div className="text-xs text-muted-foreground mt-0.5">
-                    {proStatus.isTrial && (
-                      <Badge variant="secondary" className="text-[10px] mr-1.5 px-1.5 py-0">
-                        {t(lang, "proTrial")}
-                      </Badge>
-                    )}
-                    {t(lang, "proExpires", { date: formatExpiry() })}
-                  </div>
-                )}
+        <Card className={`overflow-hidden ${proStatus.isActive ? "border-primary/30" : "border-border"}`}>
+          {!proStatus.isActive && (
+            <div className="gradient-primary px-5 py-4 text-primary-foreground">
+              <div className="flex items-center gap-2 mb-1">
+                <Crown className="h-5 w-5" />
+                <span className="font-display font-bold text-base">{t(lang, "proUser")}</span>
               </div>
-              {proStatus.isActive && (
-                <Badge className="bg-primary/15 text-primary border-primary/25 text-xs">
-                  {t(lang, "proActive")}
-                </Badge>
-              )}
-            </div>
-            {!proStatus.isActive && (
-              <>
-                <p className="text-sm text-muted-foreground">
-                  {t(lang, "proDescription")}
-                </p>
-                <Button onClick={onUpgrade} className="w-full" size="sm">
-                  {t(lang, "offlinePaywallCta")}
-                </Button>
-              </>
-            )}
-            {proStatus.isActive && (
-              <Button variant="outline" size="sm" className="text-xs">
-                {t(lang, "proManage")}
+              <p className="text-xs text-primary-foreground/80">{t(lang, "proDescription")}</p>
+              <Button onClick={onUpgrade} size="sm" className="mt-3 bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-semibold text-xs w-full rounded-xl">
+                {t(lang, "offlinePaywallCta")}
               </Button>
-            )}
-          </CardContent>
+            </div>
+          )}
+          {proStatus.isActive && (
+            <CardContent className="pt-5 pb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Crown className="h-4 w-4 text-primary" />
+                  <span className="font-semibold text-sm">{t(lang, "proUser")}</span>
+                </div>
+                <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px] font-bold">{t(lang, "proActive")}</Badge>
+              </div>
+              {proStatus.expiresAt && (
+                <div className="text-xs text-muted-foreground mt-1.5 ml-6">
+                  {proStatus.isTrial && <Badge variant="secondary" className="text-[10px] mr-1 px-1.5 py-0">{t(lang, "proTrial")}</Badge>}
+                  {t(lang, "proExpires", { date: formatExpiry() })}
+                </div>
+              )}
+              <Button variant="outline" size="sm" className="text-xs mt-3 ml-6">{t(lang, "proManage")}</Button>
+            </CardContent>
+          )}
         </Card>
 
         {/* Language */}
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Globe className="h-4 w-4" />
-              {t(lang, "language")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex gap-2">
-            <Button
-              variant={lang === "nb" ? "default" : "outline"}
-              size="sm"
-              onClick={() => onUpdate({ language: "nb" })}
-            >
-              🇳🇴 {t(lang, "norwegian")}
-            </Button>
-            <Button
-              variant={lang === "en" ? "default" : "outline"}
-              size="sm"
-              onClick={() => onUpdate({ language: "en" })}
-            >
-              🇬🇧 {t(lang, "english")}
-            </Button>
+          <CardContent className="pt-5 pb-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Globe className="h-4 w-4 text-muted-foreground" />
+              <span className="font-semibold text-sm">{t(lang, "language")}</span>
+            </div>
+            <div className="flex gap-2">
+              <Button variant={lang === "nb" ? "default" : "outline"} size="sm" onClick={() => onUpdate({ language: "nb" })} className="rounded-xl text-xs">
+                🇳🇴 {t(lang, "norwegian")}
+              </Button>
+              <Button variant={lang === "en" ? "default" : "outline"} size="sm" onClick={() => onUpdate({ language: "en" })} className="rounded-xl text-xs">
+                🇬🇧 {t(lang, "english")}
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
         {/* Quick amounts */}
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">{t(lang, "quickAmounts")}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="pt-5 pb-4 space-y-3">
+            <span className="font-semibold text-sm">{t(lang, "quickAmounts")}</span>
             <input
               value={chipsInput}
               onChange={(e) => setChipsInput(e.target.value)}
-              className="w-full bg-secondary border border-border rounded-lg px-3 py-2 text-sm text-foreground"
+              className="w-full bg-muted border-0 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               placeholder="10, 25, 50, 100, 500"
             />
-            <Button size="sm" onClick={saveChips}>{t(lang, "save")}</Button>
+            <Button size="sm" onClick={saveChips} className="rounded-xl text-xs">{t(lang, "save")}</Button>
           </CardContent>
         </Card>
 
         {/* Auto update */}
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-5 pb-4">
             <div className="flex items-center justify-between">
-              <Label htmlFor="auto-wifi" className="cursor-pointer">
-                {t(lang, "autoUpdateWifi")}
-              </Label>
-              <Switch
-                id="auto-wifi"
-                checked={settings.autoUpdateWifiOnly}
-                onCheckedChange={(v) => onUpdate({ autoUpdateWifiOnly: v })}
-              />
+              <Label htmlFor="auto-wifi" className="cursor-pointer text-sm">{t(lang, "autoUpdateWifi")}</Label>
+              <Switch id="auto-wifi" checked={settings.autoUpdateWifiOnly} onCheckedChange={(v) => onUpdate({ autoUpdateWifiOnly: v })} />
             </div>
           </CardContent>
         </Card>
 
         {/* Diagnostics */}
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">{t(lang, "diagnostics")}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">{t(lang, "lastFetch")}</span>
-              <span className="font-medium">
-                {fetchStatus === "error" ? `❌ ${lastError}` : fetchStatus === "success" ? `✅ ${t(lang, "success")}` : "—"}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">{t(lang, "cachedAge")}</span>
-              <span className="font-medium">{formatAge()}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">{t(lang, "appVersion")}</span>
-              <span className="font-medium">1.0.0</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">{t(lang, "apiProvider")}</span>
-              <span className="font-medium text-xs">open.er-api.com</span>
-            </div>
+          <CardContent className="pt-5 pb-4 space-y-2.5">
+            <span className="font-semibold text-sm">{t(lang, "diagnostics")}</span>
+            {[
+              [t(lang, "lastFetch"), fetchStatus === "error" ? `❌ ${lastError}` : fetchStatus === "success" ? `✅ ${t(lang, "success")}` : "—"],
+              [t(lang, "cachedAge"), formatAge()],
+              [t(lang, "appVersion"), "1.0.0"],
+              [t(lang, "apiProvider"), "open.er-api.com"],
+            ].map(([label, value]) => (
+              <div key={label} className="flex justify-between text-xs">
+                <span className="text-muted-foreground">{label}</span>
+                <span className="font-medium text-foreground">{value}</span>
+              </div>
+            ))}
           </CardContent>
         </Card>
 
         {/* Privacy */}
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">{t(lang, "privacy")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">{t(lang, "privacyText")}</p>
+          <CardContent className="pt-5 pb-4">
+            <span className="font-semibold text-sm block mb-1">{t(lang, "privacy")}</span>
+            <p className="text-xs text-muted-foreground">{t(lang, "privacyText")}</p>
           </CardContent>
         </Card>
       </div>
