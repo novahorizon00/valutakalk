@@ -3,6 +3,7 @@ export type Lang = "nb" | "en";
 const translations = {
   nb: {
     appName: "Offline FX",
+    currencyCalculator: "Valutakalkulator",
     amount: "Beløp",
     from: "Fra",
     to: "Til",
@@ -72,6 +73,7 @@ const translations = {
   },
   en: {
     appName: "Offline FX",
+    currencyCalculator: "Currency Calculator",
     amount: "Amount",
     from: "From",
     to: "To",
