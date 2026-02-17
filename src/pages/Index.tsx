@@ -172,11 +172,23 @@ const Index = () => {
 
       {/* Top bar */}
       <div className="flex items-center justify-between px-4 pt-3 pb-1">
-        <h1 className="font-display text-lg font-bold text-foreground">{t(lang, "currencyCalculator")}</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="font-display text-lg font-bold text-foreground">{t(lang, "currencyCalculator")}</h1>
+          <AnimatePresence>
+            {!isOnline && (
+              <motion.span
+                initial={{ opacity: 0, scale: 0.8, x: -8 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.8, x: -8 }}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-destructive/15 border border-destructive/25 text-destructive text-[10px] font-bold uppercase tracking-wider"
+              >
+                <WifiOff className="h-2.5 w-2.5" />
+                {t(lang, "offline")}
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </div>
         <div className="flex items-center gap-0.5">
-          <span className={`flex items-center gap-1 text-[11px] font-medium mr-1 ${isOnline ? "text-muted-foreground" : "text-destructive"}`}>
-            {isOnline ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
-          </span>
           {isPro && (
             <span className="text-[10px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded-full mr-1">PRO</span>
           )}
@@ -196,14 +208,19 @@ const Index = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="mx-4 mt-2 bg-accent/50 border border-border rounded-xl px-4 py-3 space-y-1"
+            className="mx-4 mt-2 bg-destructive/5 border border-destructive/20 rounded-xl px-4 py-3 space-y-1.5"
           >
             <div className="flex items-center gap-2">
-              <WifiOff className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              <span className="text-sm font-semibold text-foreground">{t(lang, "offlineBannerTitle")}</span>
+              <div className="flex items-center justify-center h-6 w-6 rounded-full bg-destructive/10">
+                <WifiOff className="h-3.5 w-3.5 text-destructive" />
+              </div>
+              <span className="text-sm font-bold text-foreground">{t(lang, "offlineBannerTitle")}</span>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">{t(lang, "offlineBannerDesc")}</p>
-            <p className="text-[11px] text-muted-foreground/70">{t(lang, "lastUpdated")}: {formatAge()}</p>
+            <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground/70">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-destructive/40 animate-pulse" />
+              {t(lang, "lastUpdated")}: {formatAge()}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
