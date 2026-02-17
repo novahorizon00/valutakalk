@@ -3,6 +3,7 @@ import { X, Star, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { currencies, COMMON_CURRENCY_CODES, getCurrencyName, type CurrencyInfo } from "@/lib/currencies";
 import { t, type Lang } from "@/lib/i18n";
+import FlagIcon from "@/components/FlagIcon";
 
 interface CurrencyPickerProps {
   lang: Lang;
@@ -50,7 +51,7 @@ export default function CurrencyPicker({
         className={`w-full flex items-center gap-3.5 px-4 py-3 text-left transition-all
           ${isSel ? "gradient-primary-subtle border-l-2 border-l-primary" : "hover:bg-muted/60"}`}
       >
-        <span className="text-2xl leading-none">{c.flag}</span>
+        <FlagIcon currencyCode={c.code} size={28} />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <span className={`font-display font-bold text-sm ${isSel ? "text-primary" : "text-foreground"}`}>{c.code}</span>
