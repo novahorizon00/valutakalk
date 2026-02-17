@@ -70,6 +70,8 @@ const translations = {
     proUser: "Pro – Offline-modus",
     proDescription: "Konverter valuta uten internett med bufrede kurser. Ubegrensede favoritter og historikk.",
     connectToConvert: "Koble til internett for å konvertere",
+    offlineBannerTitle: "Du bruker offline-kurser",
+    offlineBannerDesc: "Valutakursene er lagret lokalt og kan være utdaterte. Koble til internett for å oppdatere.",
   },
   en: {
     appName: "Offline FX",
@@ -140,6 +142,8 @@ const translations = {
     proUser: "Pro – Offline Mode",
     proDescription: "Convert currencies without internet using cached rates. Unlimited favorites and history.",
     connectToConvert: "Connect to internet to convert",
+    offlineBannerTitle: "Using offline rates",
+    offlineBannerDesc: "Exchange rates are stored locally and may be outdated. Connect to internet to refresh.",
   },
 } as const;
 

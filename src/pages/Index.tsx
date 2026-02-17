@@ -148,8 +148,20 @@ const Index = () => {
         </div>
       </div>
 
+      {/* Offline banner */}
+      {!isOnline && rates && (
+        <div className="mx-4 mt-2 bg-accent/50 border border-border rounded-xl px-4 py-3 space-y-1">
+          <div className="flex items-center gap-2">
+            <WifiOff className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <span className="text-sm font-semibold text-foreground">{t(lang, "offlineBannerTitle")}</span>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">{t(lang, "offlineBannerDesc")}</p>
+          <p className="text-[11px] text-muted-foreground/70">{t(lang, "lastUpdated")}: {formatAge()}</p>
+        </div>
+      )}
+
       {/* Stale / no rates warnings */}
-      {isStale && rates && (
+      {isStale && rates && isOnline && (
         <div className="bg-warning/10 text-warning px-4 py-1.5 text-xs text-center font-medium">
           ⚠️ {t(lang, "staleWarning", { days: Math.floor(getRatesAge(rates.timestamp) / 86_400_000).toString() })}
         </div>
