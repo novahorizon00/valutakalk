@@ -17,6 +17,7 @@ import AllRatesList from "@/components/AllRatesList";
 import WidgetSetup, { type WidgetConfig } from "@/components/WidgetSetup";
 import NumericKeypad from "@/components/NumericKeypad";
 import OnboardingGuide from "@/components/OnboardingGuide";
+import FavoritesManager from "@/components/FavoritesManager";
 
 type View = "converter" | "history" | "settings" | "widget";
 
@@ -25,7 +26,7 @@ const ONBOARDING_KEY = "offline-fx-onboarding-done";
 const Index = () => {
   const {
     settings, favorites, history, rates, isOnline, fetchStatus,
-    lastError, refreshRates, updateSettings, toggleFavorite,
+    lastError, refreshRates, updateSettings, toggleFavorite, reorderFavorites,
     addConversion, clearAllHistory, getRate, convertAmount,
     proStatus, isPro, canConvertOffline, updateProStatus,
   } = useAppState();
@@ -35,6 +36,7 @@ const Index = () => {
   const [toCurrency, setToCurrency] = useState("EUR");
   const [result, setResult] = useState<number | null>(null);
   const [pickerTarget, setPickerTarget] = useState<"from" | "to" | "favorites" | null>(null);
+  const [showFavManager, setShowFavManager] = useState(false);
   const [view, setView] = useState<View>("converter");
   const [widgetConfig, setWidgetConfig] = useState<WidgetConfig>({ currency1: "NOK", currency2: "EUR" });
   const [showKeypad, setShowKeypad] = useState(false);
@@ -354,30 +356,32 @@ const Index = () => {
         )}
 
         {/* Favorites / Quick currencies */}
-        <div className="flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-hide items-center">
-          {favorites.map((code) => {
-            const info = getCurrencyInfo(code);
-            if (!info) return null;
-            const isActive = code === fromCurrency || code === toCurrency;
-            return (
-              <motion.button
-                key={code}
-                whileTap={{ scale: 0.93 }}
-                onClick={() => handleFavoriteTap(code)}
-                className={`flex-shrink-0 flex items-center gap-1.5 pl-1.5 pr-2.5 py-1 rounded-full text-xs font-semibold transition-all
-                  ${isActive
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "bg-card border border-border text-foreground hover:border-primary/30"
-                  }`}
-              >
-                <FlagIcon currencyCode={code} size={16} />
-                <span>{code}</span>
-              </motion.button>
-            );
-          })}
+        <div className="flex gap-1.5 items-center">
+          <div className="flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-hide items-center flex-1 min-w-0">
+            {favorites.map((code) => {
+              const info = getCurrencyInfo(code);
+              if (!info) return null;
+              const isActive = code === fromCurrency || code === toCurrency;
+              return (
+                <motion.button
+                  key={code}
+                  whileTap={{ scale: 0.93 }}
+                  onClick={() => handleFavoriteTap(code)}
+                  className={`flex-shrink-0 flex items-center gap-1.5 pl-1.5 pr-2.5 py-1 rounded-full text-xs font-semibold transition-all
+                    ${isActive
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "bg-card border border-border text-foreground hover:border-primary/30"
+                    }`}
+                >
+                  <FlagIcon currencyCode={code} size={16} />
+                  <span>{code}</span>
+                </motion.button>
+              );
+            })}
+          </div>
           <motion.button
             whileTap={{ scale: 0.93 }}
-            onClick={() => setPickerTarget("favorites")}
+            onClick={() => setShowFavManager(true)}
             className="flex-shrink-0 flex items-center justify-center h-7 w-7 rounded-full border border-dashed border-border text-muted-foreground hover:border-primary/40 hover:text-primary transition-all"
             aria-label="Edit favorites"
           >
@@ -430,6 +434,20 @@ const Index = () => {
           onClose={() => setPickerTarget(null)}
         />
       )}
+
+      {/* Favorites Manager */}
+      <AnimatePresence>
+        {showFavManager && (
+          <FavoritesManager
+            lang={lang}
+            favorites={favorites}
+            onReorder={reorderFavorites}
+            onRemove={(code) => toggleFavorite(code)}
+            onAddMore={() => { setShowFavManager(false); setPickerTarget("favorites"); }}
+            onClose={() => setShowFavManager(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

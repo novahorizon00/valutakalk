@@ -102,6 +102,14 @@ export function useAppState() {
     []
   );
 
+  const reorderFavorites = useCallback(
+    (newOrder: string[]) => {
+      setFavoritesState(newOrder);
+      saveFavorites(newOrder);
+    },
+    []
+  );
+
   const addConversion = useCallback(
     async (fromCurrency: string, toCurrency: string, amount: number, result: number, rate: number) => {
       const record: ConversionRecord = {
@@ -160,6 +168,7 @@ export function useAppState() {
     refreshRates,
     updateSettings,
     toggleFavorite,
+    reorderFavorites,
     addConversion,
     clearAllHistory,
     getRate,
