@@ -12,6 +12,7 @@ import CurrencyPicker from "@/components/CurrencyPicker";
 import HistoryView from "@/components/HistoryView";
 import SettingsView from "@/components/SettingsView";
 import OfflinePaywall from "@/components/OfflinePaywall";
+import AllRatesList from "@/components/AllRatesList";
 
 type View = "converter" | "history" | "settings";
 
@@ -286,6 +287,16 @@ const Index = () => {
               );
             })}
           </div>
+        )}
+
+        {/* All rates – Pro only */}
+        {isPro && rates && (
+          <AllRatesList
+            lang={lang}
+            fromCurrency={fromCurrency}
+            getRate={getRate}
+            formatResult={formatResult}
+          />
         )}
 
         {/* Status + refresh */}
