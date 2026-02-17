@@ -7,6 +7,36 @@ export interface FetchResult {
   success: boolean;
   rates: CachedRates | null;
   error?: string;
+  warnings?: string[];
+}
+
+/** Minimum currencies we expect from a valid API response */
+const EXPECTED_CURRENCIES = ["USD", "GBP", "NOK", "SEK", "JPY", "CHF"];
+
+/**
+ * Validate rates object for structural integrity.
+ * Returns an array of warning strings (empty = all good).
+ */
+function validateRates(rates: Record<string, number>): string[] {
+  const warnings: string[] = [];
+
+  const keys = Object.keys(rates);
+  if (keys.length < 10) {
+    warnings.push(`Only ${keys.length} currencies returned (expected 50+)`);
+  }
+
+  const missing = EXPECTED_CURRENCIES.filter((c) => !(c in rates));
+  if (missing.length > 0) {
+    warnings.push(`Missing expected currencies: ${missing.join(", ")}`);
+  }
+
+  for (const [code, value] of Object.entries(rates)) {
+    if (typeof value !== "number" || !isFinite(value) || value <= 0) {
+      warnings.push(`Invalid rate for ${code}: ${value}`);
+    }
+  }
+
+  return warnings;
 }
 
 export async function fetchRates(): Promise<FetchResult> {
@@ -28,6 +58,8 @@ export async function fetchRates(): Promise<FetchResult> {
       throw new Error("Invalid rates data");
     }
 
+    const warnings = validateRates(data.rates);
+
     const cached: CachedRates = {
       base: data.base || "EUR",
       rates: data.rates,
@@ -35,7 +67,7 @@ export async function fetchRates(): Promise<FetchResult> {
     };
 
     await saveRates(cached);
-    return { success: true, rates: cached };
+    return { success: true, rates: cached, warnings: warnings.length > 0 ? warnings : undefined };
   } catch (error) {
     const existing = await getCachedRates();
     return {
