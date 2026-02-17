@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import HistoryChart from "@/components/HistoryChart";
 
 type Mode = "single" | "multi" | "history";
-type PickerFor = "base" | "target" | "addCompare" | "addBase" | "historyTarget" | "historyBase" | null;
+type PickerFor = "base" | "target" | "addCompare" | "addBase" | "historyTarget" | "historyBase" | "historyCompare" | null;
 
 interface AllRatesListProps {
   lang: Lang;
@@ -144,6 +144,8 @@ export default function AllRatesList({ lang, fromCurrency, getRate, formatResult
       setHistoryTarget(code);
     } else if (pickerFor === "historyBase") {
       setBaseCurrency(code);
+    } else if (pickerFor === "historyCompare") {
+      setHistoryCompare((prev) => [...prev, code]);
     }
     setPickerFor(null);
   };
@@ -155,6 +157,7 @@ export default function AllRatesList({ lang, fromCurrency, getRate, formatResult
     if (pickerFor === "addBase") return [targetCurrency, ...baseCurrenciesMulti];
     if (pickerFor === "historyTarget") return [baseCurrency, ...historyCompare];
     if (pickerFor === "historyBase") return [historyTarget, ...historyCompare];
+    if (pickerFor === "historyCompare") return [baseCurrency, historyTarget, ...historyCompare];
     return [];
   }, [pickerFor, baseCurrency, compareCurrencies, baseCurrenciesMulti, targetCurrency, historyCompare]);
 
@@ -441,16 +444,18 @@ export default function AllRatesList({ lang, fromCurrency, getRate, formatResult
                   </div>
                 )}
                 <button
-                  onClick={() => {
-                    const next = compareCurrencies.find((c) => c !== historyTarget && !historyCompare.includes(c));
-                    if (next) setHistoryCompare((prev) => [...prev, next]);
-                  }}
+                  onClick={() => setPickerFor(pickerFor === "historyCompare" ? null : "historyCompare")}
                   className="flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80 transition-colors"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   {lang === "nb" ? "Sammenlign med annen valuta" : "Compare with another currency"}
                 </button>
               </div>
+              {pickerFor === "historyCompare" && (
+                <div className="border-t border-border/50">
+                  <MiniPicker lang={lang} exclude={pickerExclude} onSelect={handlePickerSelect} onClose={closePicker} />
+                </div>
+              )}
             </>
           ) : null}
         </div>
