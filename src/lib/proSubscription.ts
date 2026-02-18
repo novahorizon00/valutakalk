@@ -70,7 +70,7 @@ export async function activateDevSubscription(daysValid = 30): Promise<ProSubscr
     expiresAt: expires.toISOString(),
     isTrial: false,
     purchasedAt: now.toISOString(),
-    productId: "dev_test",
+    productId: "valutakalk.pro.monthly",
   };
   await saveProStatus(status);
   return status;
