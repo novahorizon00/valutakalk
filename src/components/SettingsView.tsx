@@ -57,7 +57,7 @@ export default function SettingsView({
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <header className="gradient-primary px-4 py-3 flex items-center gap-2 text-primary-foreground">
+      <header className="gradient-primary px-4 py-3 safe-top flex items-center gap-2 text-primary-foreground">
         <Button variant="ghost" size="icon" onClick={onBack} className="text-primary-foreground hover:bg-primary-foreground/10 h-9 w-9">
           <ArrowLeft className="h-5 w-5" />
         </Button>
@@ -94,7 +94,17 @@ export default function SettingsView({
                   {t(lang, "proExpires", { date: formatExpiry() })}
                 </div>
               )}
-              <Button variant="outline" size="sm" className="text-xs mt-3 ml-6">{t(lang, "proManage")}</Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs mt-3 ml-6"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open("https://apps.apple.com/account/subscriptions", "_blank");
+                }}
+              >
+                {t(lang, "proManage")}
+              </Button>
             </CardContent>
           )}
         </Card>
@@ -239,7 +249,7 @@ export default function SettingsView({
           </CardContent>
         </Card>
 
-        <p className="text-center text-[10px] text-muted-foreground/50 pb-2">🇳🇴 {lang === "nb" ? "Utviklet i Norge" : "Developed in Norway"}</p>
+        <p className="text-center text-[10px] text-muted-foreground/50 pb-2 safe-bottom">🇳🇴 {lang === "nb" ? "Utviklet i Norge" : "Developed in Norway"}</p>
       </div>
     </div>
   );

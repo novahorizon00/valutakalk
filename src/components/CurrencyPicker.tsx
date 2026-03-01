@@ -75,7 +75,7 @@ export default function CurrencyPicker({
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col animate-in slide-in-from-bottom duration-200">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-card">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-card safe-top">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
@@ -92,7 +92,7 @@ export default function CurrencyPicker({
       </div>
 
       {/* List */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto safe-bottom">
         {filtered ? (
           filtered.length === 0 ? (
             <div className="p-12 text-center text-muted-foreground text-sm">No results</div>

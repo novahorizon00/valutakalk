@@ -21,7 +21,7 @@ export default function HistoryView({ history, lang, onBack, onClear }: HistoryV
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <header className="gradient-primary px-4 py-3 flex items-center justify-between text-primary-foreground">
+      <header className="gradient-primary px-4 py-3 safe-top flex items-center justify-between text-primary-foreground">
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" onClick={onBack} className="text-primary-foreground hover:bg-primary-foreground/10 h-9 w-9">
             <ArrowLeft className="h-5 w-5" />
