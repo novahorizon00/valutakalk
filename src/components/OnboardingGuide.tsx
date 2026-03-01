@@ -38,9 +38,9 @@ export default function OnboardingGuide({ lang, onComplete }: OnboardingGuidePro
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[60] bg-background/95 backdrop-blur-sm flex flex-col items-center justify-center px-6"
+      className="fixed inset-0 z-[60] bg-background/95 backdrop-blur-sm flex flex-col items-center justify-center px-6 safe-y"
     >
-      <button onClick={onComplete} className="absolute top-4 right-4 p-2 rounded-full hover:bg-muted text-muted-foreground">
+      <button onClick={onComplete} className="absolute top-4 right-4 p-2 rounded-full hover:bg-muted text-muted-foreground safe-top safe-right">
         <X className="h-5 w-5" />
       </button>
 

@@ -162,7 +162,7 @@ const Index = () => {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           onClick={handleUpgrade}
-          className="w-full flex items-center gap-2.5 px-4 py-2.5 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/5 border-b border-primary/10 text-xs font-medium text-primary hover:from-primary/15 hover:via-accent/15 transition-all"
+          className="w-full safe-top flex items-center gap-2.5 px-4 py-2.5 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/5 border-b border-primary/10 text-xs font-medium text-primary hover:from-primary/15 hover:via-accent/15 transition-all"
         >
           <Plane className="h-3.5 w-3.5 flex-shrink-0" />
           <span className="flex-1 text-left">{t(lang, "offlinePaywallCta")}</span>
@@ -171,7 +171,7 @@ const Index = () => {
       )}
 
       {/* Top bar */}
-      <div className="flex items-center justify-between px-4 pt-3 pb-1">
+      <div className={`flex items-center justify-between px-4 pt-3 pb-1 ${isPro ? 'safe-top' : ''}`}>
         <div className="flex items-center gap-2">
           <h1 className="font-display text-lg font-bold text-foreground">{t(lang, "currencyCalculator")}</h1>
           <AnimatePresence>
@@ -237,7 +237,7 @@ const Index = () => {
         </div>
       )}
 
-      <main className="flex-1 px-4 py-3 max-w-3xl mx-auto w-full space-y-3">
+      <main className="flex-1 px-4 py-3 max-w-3xl mx-auto w-full space-y-3 safe-bottom">
         {/* Converter cards – side by side on tablet+ */}
         <div className="flex flex-col md:flex-row md:items-stretch md:gap-3">
           {/* FROM: currency selector + amount */}

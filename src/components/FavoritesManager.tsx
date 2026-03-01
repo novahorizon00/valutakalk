@@ -19,7 +19,7 @@ export default function FavoritesManager({
   lang, favorites, onReorder, onRemove, onAddMore, onClose,
 }: FavoritesManagerProps) {
   return (
-    <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-end sm:items-center justify-center animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-end sm:items-center justify-center animate-in fade-in duration-150 safe-bottom">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
