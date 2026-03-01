@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, Globe, Crown, Sun, Moon, Monitor, Smartphone } from "lucide-react";
+import { ArrowLeft, Globe, Crown, Sun, Moon, Monitor, Smartphone, RotateCcw } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -22,11 +22,12 @@ interface SettingsViewProps {
   onBack: () => void;
   onUpdate: (partial: Partial<UserSettings>) => void;
   onUpgrade: () => void;
+  onRestore: () => void;
   onOpenWidget: () => void;
 }
 
 export default function SettingsView({
-  settings, lang, fetchStatus, lastError, rates, proStatus, onBack, onUpdate, onUpgrade, onOpenWidget,
+  settings, lang, fetchStatus, lastError, rates, proStatus, onBack, onUpdate, onUpgrade, onRestore, onOpenWidget,
 }: SettingsViewProps) {
   const [chipsInput, setChipsInput] = useState(settings.quickAmounts.join(", "));
   const { theme, setTheme } = useTheme();
@@ -77,6 +78,10 @@ export default function SettingsView({
               <p className="text-xs text-primary-foreground/80">{t(lang, "proDescription")}</p>
               <Button onClick={onUpgrade} size="sm" className="mt-3 bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-semibold text-xs w-full rounded-xl">
                 {t(lang, "offlinePaywallCta")}
+              </Button>
+              <Button onClick={onRestore} variant="ghost" size="sm" className="mt-2 text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/10 text-xs w-full rounded-xl gap-1.5">
+                <RotateCcw className="h-3 w-3" />
+                {t(lang, "proRestore")}
               </Button>
             </div>
           )}
