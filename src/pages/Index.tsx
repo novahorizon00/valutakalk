@@ -8,7 +8,7 @@ import { useAppState } from "@/hooks/useAppState";
 import { t, type Lang } from "@/lib/i18n";
 import { getCurrencyInfo, getCurrencyName } from "@/lib/currencies";
 import { areRatesStale, getRatesAge } from "@/lib/rateService";
-import { activateDevSubscription } from "@/lib/proSubscription";
+import { initIAP, purchasePro, restorePurchases, checkSubscriptionStatus } from "@/lib/iapService";
 import CurrencyPicker from "@/components/CurrencyPicker";
 import HistoryView from "@/components/HistoryView";
 import SettingsView from "@/components/SettingsView";
@@ -101,9 +101,28 @@ const Index = () => {
     if (toCurrency === code) setFromCurrency(code);
     else setToCurrency(code);
   };
+  // Initialize IAP on mount
+  useEffect(() => {
+    initIAP().then(() => {
+      checkSubscriptionStatus().then((status) => updateProStatus(status));
+    });
+  }, []);
+
   const handleUpgrade = async () => {
-    const status = await activateDevSubscription(7);
-    updateProStatus(status);
+    try {
+      const status = await purchasePro();
+      updateProStatus(status);
+    } catch (err) {
+      console.error("Purchase failed:", err);
+    }
+  };
+  const handleRestore = async () => {
+    try {
+      const status = await restorePurchases();
+      updateProStatus(status);
+    } catch (err) {
+      console.error("Restore failed:", err);
+    }
   };
   const handleOnboardingComplete = () => {
     localStorage.setItem(ONBOARDING_KEY, "1");
@@ -146,7 +165,7 @@ const Index = () => {
   }
 
   if (view === "history") return <HistoryView history={history} lang={lang} onBack={() => setView("converter")} onClear={clearAllHistory} />;
-  if (view === "settings") return <SettingsView settings={settings} lang={lang} fetchStatus={fetchStatus} lastError={lastError} rates={rates} proStatus={proStatus} onBack={() => setView("converter")} onUpdate={updateSettings} onUpgrade={handleUpgrade} onRestore={handleUpgrade} onOpenWidget={() => setView("widget")} />;
+  if (view === "settings") return <SettingsView settings={settings} lang={lang} fetchStatus={fetchStatus} lastError={lastError} rates={rates} proStatus={proStatus} onBack={() => setView("converter")} onUpdate={updateSettings} onUpgrade={handleUpgrade} onRestore={handleRestore} onOpenWidget={() => setView("widget")} />;
   if (view === "widget") return <WidgetSetup lang={lang} config={widgetConfig} onSave={setWidgetConfig} onBack={() => setView("settings")} />;
 
   return (
