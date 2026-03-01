@@ -57,7 +57,8 @@ export default function SettingsView({
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <header className="gradient-primary px-4 py-3 safe-top flex items-center gap-2 text-primary-foreground">
+      <div className="safe-top gradient-primary" />
+      <header className="gradient-primary px-4 py-3 flex items-center gap-2 text-primary-foreground">
         <Button variant="ghost" size="icon" onClick={onBack} className="text-primary-foreground hover:bg-primary-foreground/10 h-9 w-9">
           <ArrowLeft className="h-5 w-5" />
         </Button>

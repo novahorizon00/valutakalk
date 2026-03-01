@@ -40,7 +40,7 @@ export default function OnboardingGuide({ lang, onComplete }: OnboardingGuidePro
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-[60] bg-background/95 backdrop-blur-sm flex flex-col items-center justify-center px-6 safe-y"
     >
-      <button onClick={onComplete} className="absolute top-4 right-4 p-2 rounded-full hover:bg-muted text-muted-foreground safe-top safe-right">
+      <button onClick={onComplete} className="absolute top-0 right-0 mt-[max(1rem,env(safe-area-inset-top,1rem))] mr-[max(1rem,env(safe-area-inset-right,1rem))] p-3 rounded-full hover:bg-muted text-muted-foreground z-10">
         <X className="h-5 w-5" />
       </button>
 
