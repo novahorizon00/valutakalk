@@ -74,8 +74,10 @@ export default function CurrencyPicker({
 
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col animate-in slide-in-from-bottom duration-200">
+      {/* Safe area spacer */}
+      <div className="safe-top bg-card" />
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-card safe-top">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-card">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
