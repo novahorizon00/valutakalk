@@ -146,7 +146,7 @@ const Index = () => {
   }
 
   if (view === "history") return <HistoryView history={history} lang={lang} onBack={() => setView("converter")} onClear={clearAllHistory} />;
-  if (view === "settings") return <SettingsView settings={settings} lang={lang} fetchStatus={fetchStatus} lastError={lastError} rates={rates} proStatus={proStatus} onBack={() => setView("converter")} onUpdate={updateSettings} onUpgrade={handleUpgrade} onOpenWidget={() => setView("widget")} />;
+  if (view === "settings") return <SettingsView settings={settings} lang={lang} fetchStatus={fetchStatus} lastError={lastError} rates={rates} proStatus={proStatus} onBack={() => setView("converter")} onUpdate={updateSettings} onUpgrade={handleUpgrade} onRestore={handleUpgrade} onOpenWidget={() => setView("widget")} />;
   if (view === "widget") return <WidgetSetup lang={lang} config={widgetConfig} onSave={setWidgetConfig} onBack={() => setView("settings")} />;
 
   return (
@@ -158,20 +158,6 @@ const Index = () => {
 
       {/* iOS safe area spacer - always present */}
       <div className="safe-top" />
-
-      {/* Pro banner for free users */}
-      {!isPro && (
-        <motion.button
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          onClick={handleUpgrade}
-          className="w-full flex items-center gap-2.5 px-4 py-2.5 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/5 border-b border-primary/10 text-xs font-medium text-primary hover:from-primary/15 hover:via-accent/15 transition-all"
-        >
-          <Plane className="h-3.5 w-3.5 flex-shrink-0" />
-          <span className="flex-1 text-left">{t(lang, "offlinePaywallCta")}</span>
-          <ChevronRight className="h-3.5 w-3.5 flex-shrink-0 opacity-50" />
-        </motion.button>
-      )}
 
       {/* Top bar */}
       <div className="flex items-center justify-between px-4 pt-3 pb-1">
@@ -203,6 +189,21 @@ const Index = () => {
           </Button>
         </div>
       </div>
+
+      {/* Pro banner for free users - below header so it's always visible */}
+      {!isPro && (
+        <motion.button
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          onClick={handleUpgrade}
+          className="mx-4 mt-2 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-gradient-to-r from-primary/10 via-accent/10 to-primary/5 border border-primary/15 text-xs font-medium text-primary hover:from-primary/15 hover:via-accent/15 transition-all"
+        >
+          <Plane className="h-4 w-4 flex-shrink-0" />
+          <span className="flex-1 text-left leading-snug">{t(lang, "offlinePaywallCta")}</span>
+          <ChevronRight className="h-3.5 w-3.5 flex-shrink-0 opacity-50" />
+        </motion.button>
+      )}
+
 
       {/* Offline banner */}
       <AnimatePresence>
