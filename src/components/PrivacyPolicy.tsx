@@ -64,6 +64,15 @@ export default function PrivacyPolicy({ lang, onBack }: PrivacyPolicyProps) {
             </p>
 
             <h3 className="font-semibold text-sm mt-3">
+              {isNb ? "Datakilde" : "Data source"}
+            </h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {isNb
+                ? "Valutakursene i appen hentes fra ExchangeRate-API (open.er-api.com), en gratis og åpen API-tjeneste som leverer daglig oppdaterte valutakurser. Kursene er veiledende og kan avvike fra faktiske bank- eller markedskurser."
+                : "Exchange rates in the app are fetched from ExchangeRate-API (open.er-api.com), a free and open API service providing daily updated exchange rates. Rates are indicative and may differ from actual bank or market rates."}
+            </p>
+
+            <h3 className="font-semibold text-sm mt-3">
               {isNb ? "Kontakt" : "Contact"}
             </h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
