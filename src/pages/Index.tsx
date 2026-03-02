@@ -18,8 +18,9 @@ import WidgetSetup, { type WidgetConfig } from "@/components/WidgetSetup";
 import NumericKeypad from "@/components/NumericKeypad";
 import OnboardingGuide from "@/components/OnboardingGuide";
 import FavoritesManager from "@/components/FavoritesManager";
+import PrivacyPolicy from "@/components/PrivacyPolicy";
 
-type View = "converter" | "history" | "settings" | "widget";
+type View = "converter" | "history" | "settings" | "widget" | "privacy";
 
 const ONBOARDING_KEY = "offline-fx-onboarding-done";
 
@@ -165,8 +166,9 @@ const Index = () => {
   }
 
   if (view === "history") return <HistoryView history={history} lang={lang} onBack={() => setView("converter")} onClear={clearAllHistory} />;
-  if (view === "settings") return <SettingsView settings={settings} lang={lang} fetchStatus={fetchStatus} lastError={lastError} rates={rates} proStatus={proStatus} onBack={() => setView("converter")} onUpdate={updateSettings} onUpgrade={handleUpgrade} onRestore={handleRestore} onOpenWidget={() => setView("widget")} />;
+  if (view === "settings") return <SettingsView settings={settings} lang={lang} fetchStatus={fetchStatus} lastError={lastError} rates={rates} proStatus={proStatus} onBack={() => setView("converter")} onUpdate={updateSettings} onUpgrade={handleUpgrade} onRestore={handleRestore} onOpenWidget={() => setView("widget")} onOpenPrivacy={() => setView("privacy")} />;
   if (view === "widget") return <WidgetSetup lang={lang} config={widgetConfig} onSave={setWidgetConfig} onBack={() => setView("settings")} />;
+  if (view === "privacy") return <PrivacyPolicy lang={lang} onBack={() => setView("settings")} />;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
