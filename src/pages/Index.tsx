@@ -434,8 +434,11 @@ const Index = () => {
                 if (!el) return;
                 const checkScroll = () => {
                   const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
-                  const fade = el.parentElement?.querySelector('[data-scroll-fade]') as HTMLElement;
-                  if (fade) fade.style.opacity = atEnd ? '0' : '1';
+                  const atStart = el.scrollLeft <= 4;
+                  const fadeRight = el.parentElement?.querySelector('[data-scroll-fade-right]') as HTMLElement;
+                  const fadeLeft = el.parentElement?.querySelector('[data-scroll-fade-left]') as HTMLElement;
+                  if (fadeRight) fadeRight.style.opacity = atEnd ? '0' : '1';
+                  if (fadeLeft) fadeLeft.style.opacity = atStart ? '0' : '1';
                 };
                 el.addEventListener('scroll', checkScroll, { passive: true });
                 // Initial check after render
@@ -467,8 +470,9 @@ const Index = () => {
                 );
               })}
             </div>
-            {/* Scroll fade hint */}
-            <div data-scroll-fade className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none transition-opacity duration-200" />
+            {/* Scroll fade hints */}
+            <div data-scroll-fade-left className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent pointer-events-none transition-opacity duration-200 opacity-0" />
+            <div data-scroll-fade-right className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none transition-opacity duration-200" />
           </div>
           <motion.button
             whileTap={{ scale: 0.9, rotate: 15 }}
