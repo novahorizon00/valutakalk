@@ -52,12 +52,17 @@ export default function OfflinePaywall({ lang, onUpgrade, onRestore, onOpenPriva
         </Button>
 
         {hadPreviousSubscription && (
-          <button
-            onClick={() => window.open("https://apps.apple.com/account/subscriptions", "_blank")}
-            className="text-[11px] text-primary-foreground/70 underline hover:text-primary-foreground/90"
-          >
-            {t(lang, "proManage")}
-          </button>
+          <div className="space-y-1 text-center">
+            <p className="text-[11px] text-primary-foreground/80 font-medium">
+              {t(lang, "proExpired")}
+            </p>
+            <button
+              onClick={() => window.open("https://apps.apple.com/account/subscriptions", "_blank")}
+              className="text-[11px] text-primary-foreground/70 underline hover:text-primary-foreground/90"
+            >
+              {t(lang, "proManage")}
+            </button>
+          </div>
         )}
 
         {/* Terms & Privacy links */}
