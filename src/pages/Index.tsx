@@ -365,7 +365,7 @@ const Index = () => {
 
           {/* TO: currency selector + result */}
           {showOfflinePaywall ? (
-            <OfflinePaywall lang={lang} onUpgrade={handleUpgrade} />
+            <OfflinePaywall lang={lang} onUpgrade={handleUpgrade} onOpenPrivacy={() => setView("privacy")} />
           ) : (
             <motion.div
               layout

@@ -6,9 +6,12 @@ import { t, type Lang } from "@/lib/i18n";
 interface OfflinePaywallProps {
   lang: Lang;
   onUpgrade: () => void;
+  onOpenPrivacy?: () => void;
 }
 
-export default function OfflinePaywall({ lang, onUpgrade }: OfflinePaywallProps) {
+export default function OfflinePaywall({ lang, onUpgrade, onOpenPrivacy }: OfflinePaywallProps) {
+  const isNb = lang === "nb";
+
   return (
     <div className="rounded-2xl overflow-hidden">
       <div className="gradient-primary p-6 text-primary-foreground text-center space-y-3">
@@ -20,6 +23,14 @@ export default function OfflinePaywall({ lang, onUpgrade }: OfflinePaywallProps)
           <p className="text-sm text-primary-foreground/80 mt-1">{t(lang, "offlinePaywallSubtitle")}</p>
         </div>
         <p className="text-xs text-primary-foreground/70">{t(lang, "proDescription")}</p>
+
+        {/* Price & duration */}
+        <div className="text-xs text-primary-foreground/90 font-medium">
+          {isNb
+            ? "9 kr/måned · Fornyes automatisk · 7 dager gratis prøveperiode"
+            : "9 NOK/month · Auto-renews · 7-day free trial"}
+        </div>
+
         <Button
           onClick={onUpgrade}
           className="w-full py-5 text-sm font-bold rounded-xl bg-primary-foreground text-primary hover:bg-primary-foreground/90 shadow-lg"
@@ -27,6 +38,26 @@ export default function OfflinePaywall({ lang, onUpgrade }: OfflinePaywallProps)
         >
           {t(lang, "offlinePaywallCta")}
         </Button>
+
+        {/* Terms & Privacy links */}
+        <div className="flex items-center justify-center gap-3 text-[10px] text-primary-foreground/60">
+          <a
+            href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-primary-foreground/80"
+          >
+            {t(lang, "termsOfUse")}
+          </a>
+          <span>·</span>
+          {onOpenPrivacy ? (
+            <button onClick={onOpenPrivacy} className="underline hover:text-primary-foreground/80">
+              {t(lang, "privacyPolicyTitle")}
+            </button>
+          ) : (
+            <span>{t(lang, "privacyPolicyTitle")}</span>
+          )}
+        </div>
       </div>
     </div>
   );
