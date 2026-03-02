@@ -57,7 +57,7 @@ const translations = {
     // Pro / monetization
     offlinePaywallTitle: "Du er frakoblet",
     offlinePaywallSubtitle: "Aktiver Offline-modus for reisende.",
-    offlinePaywallCta: "Aktiver Offline-modus – 9 kr/mnd (7 dager gratis prøveperiode)",
+    offlinePaywallCta: "Start 7 dager gratis prøveperiode",
     proLabel: "Pro",
     proBadge: "Pro",
     proActive: "Offline-modus aktiv",
@@ -147,7 +147,7 @@ const translations = {
     // Pro / monetization
     offlinePaywallTitle: "You're offline",
     offlinePaywallSubtitle: "Enable Offline Mode for travelers.",
-    offlinePaywallCta: "Enable Offline Mode – 9 NOK/month (7-day free trial)",
+    offlinePaywallCta: "Start 7-day free trial",
     proLabel: "Pro",
     proBadge: "Pro",
     proActive: "Offline Mode active",
