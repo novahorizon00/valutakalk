@@ -94,12 +94,21 @@ export default function CurrencyPicker({
   };
 
   return (
-    <motion.div
-      initial={{ y: "100%" }}
-      animate={{ y: isClosing ? "100%" : 0 }}
-      transition={{ type: "spring", damping: 28, stiffness: 300 }}
-      className="fixed inset-0 z-50 bg-background flex flex-col"
-    >
+    <>
+      {/* Dark overlay */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isClosing ? 0 : 1 }}
+        transition={{ duration: 0.25 }}
+        className="fixed inset-0 z-40 bg-black/60"
+        onClick={handleClose}
+      />
+      <motion.div
+        initial={{ y: "100%" }}
+        animate={{ y: isClosing ? "100%" : 0 }}
+        transition={{ type: "spring", damping: 28, stiffness: 300 }}
+        className="fixed inset-0 z-50 bg-background flex flex-col"
+      >
       {/* Safe area spacer */}
       <div className="safe-top bg-card" />
       {/* Header */}
@@ -155,5 +164,6 @@ export default function CurrencyPicker({
         )}
       </div>
     </motion.div>
+    </>
   );
 }
