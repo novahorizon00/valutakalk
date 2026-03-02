@@ -7,6 +7,11 @@ interface WidgetBridgePlugin {
     rate: number;
     updatedAt: string;
   }): Promise<void>;
+  saveAllRates(options: {
+    base: string;
+    rates: string; // JSON string of { [code]: number }
+    updatedAt: string;
+  }): Promise<void>;
   reloadWidgets(): Promise<void>;
 }
 
@@ -46,6 +51,33 @@ export async function saveWidgetConfig(
     return true;
   } catch (err) {
     console.warn("[WidgetBridge] Failed to save widget data", err);
+    return false;
+  }
+}
+
+/**
+ * Push ALL exchange rates to the native layer so the configurable widget
+ * can compute cross-rates for any user-chosen currency pair.
+ */
+export async function saveAllRatesToWidget(
+  base: string,
+  rates: Record<string, number>
+): Promise<boolean> {
+  if (!isNativePlatform()) {
+    return false;
+  }
+
+  try {
+    await WidgetBridge.saveAllRates({
+      base,
+      rates: JSON.stringify(rates),
+      updatedAt: new Date().toISOString(),
+    });
+    await WidgetBridge.reloadWidgets();
+    console.log("[WidgetBridge] All rates saved for configurable widget");
+    return true;
+  } catch (err) {
+    console.warn("[WidgetBridge] Failed to save all rates", err);
     return false;
   }
 }

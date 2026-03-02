@@ -15,6 +15,7 @@ import {
 import { fetchRates, getCrossRate, convert, areRatesStale, type FetchResult } from "@/lib/rateService";
 import { getProStatus, saveProStatus, canUseOffline, type ProSubscription } from "@/lib/proSubscription";
 import { useConnectivity } from "./useConnectivity";
+import { saveAllRatesToWidget } from "@/lib/widgetBridge";
 
 export type FetchStatus = "idle" | "loading" | "success" | "error";
 
@@ -61,6 +62,8 @@ export function useAppState() {
     if (result.success && result.rates) {
       setRates(result.rates);
       setFetchStatus("success");
+      // Push all rates to native widget layer for configurable widgets
+      saveAllRatesToWidget(result.rates.base, result.rates.rates);
       // Non-blocking warning for malformed but usable data
       if (result.warnings && result.warnings.length > 0) {
         const { toast } = await import("sonner");
