@@ -428,7 +428,20 @@ const Index = () => {
           className="flex gap-1.5 items-center"
         >
           <div className="relative flex-1 min-w-0">
-            <div className="flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-hide items-center">
+            <div
+              className="flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-hide items-center"
+              ref={(el) => {
+                if (!el) return;
+                const checkScroll = () => {
+                  const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
+                  const fade = el.parentElement?.querySelector('[data-scroll-fade]') as HTMLElement;
+                  if (fade) fade.style.opacity = atEnd ? '0' : '1';
+                };
+                el.addEventListener('scroll', checkScroll, { passive: true });
+                // Initial check after render
+                requestAnimationFrame(checkScroll);
+              }}
+            >
               {favorites.map((code, i) => {
                 const info = getCurrencyInfo(code);
                 if (!info) return null;
@@ -455,7 +468,7 @@ const Index = () => {
               })}
             </div>
             {/* Scroll fade hint */}
-            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none" />
+            <div data-scroll-fade className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none transition-opacity duration-200" />
           </div>
           <motion.button
             whileTap={{ scale: 0.9, rotate: 15 }}
