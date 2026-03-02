@@ -68,9 +68,9 @@ export default function SettingsView({
       </header>
 
       <div className="flex-1 overflow-y-auto px-4 py-5 max-w-lg mx-auto w-full space-y-3">
-        {/* Subscription */}
-        <Card className={`overflow-hidden ${proStatus.isActive ? "border-primary/30" : "border-border"}`}>
+        {/* Subscription upgrade – only for non-Pro */}
         {!proStatus.isActive && (
+          <Card className="overflow-hidden border-border">
             <div className="gradient-primary px-5 py-4 text-primary-foreground">
               <div className="flex items-center gap-2 mb-1">
                 <Crown className="h-5 w-5" />
@@ -99,36 +99,8 @@ export default function SettingsView({
                 </button>
               </div>
             </div>
-          )}
-          {proStatus.isActive && (
-            <CardContent className="pt-5 pb-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Crown className="h-4 w-4 text-primary" />
-                  <span className="font-semibold text-sm">{t(lang, "proUser")}</span>
-                </div>
-                <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px] font-bold">{t(lang, "proActive")}</Badge>
-              </div>
-              {proStatus.expiresAt && (
-                <div className="text-xs text-muted-foreground mt-1.5 ml-6">
-                  {proStatus.isTrial && <Badge variant="secondary" className="text-[10px] mr-1 px-1.5 py-0">{t(lang, "proTrial")}</Badge>}
-                  {t(lang, "proExpires", { date: formatExpiry() })}
-                </div>
-              )}
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-xs mt-3 ml-6"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  window.open("https://apps.apple.com/account/subscriptions", "_blank");
-                }}
-              >
-                {t(lang, "proManage")}
-              </Button>
-            </CardContent>
-          )}
-        </Card>
+          </Card>
+        )}
 
         {/* Theme / Dark mode */}
         <Card>
@@ -261,6 +233,38 @@ export default function SettingsView({
             ))}
           </CardContent>
         </Card>
+
+        {/* Pro subscription management – active users */}
+        {proStatus.isActive && (
+          <Card className="overflow-hidden border-primary/30">
+            <CardContent className="pt-5 pb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Crown className="h-4 w-4 text-primary" />
+                  <span className="font-semibold text-sm">{t(lang, "proUser")}</span>
+                </div>
+                <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px] font-bold">{t(lang, "proActive")}</Badge>
+              </div>
+              {proStatus.expiresAt && (
+                <div className="text-xs text-muted-foreground mt-1.5 ml-6">
+                  {proStatus.isTrial && <Badge variant="secondary" className="text-[10px] mr-1 px-1.5 py-0">{t(lang, "proTrial")}</Badge>}
+                  {t(lang, "proExpires", { date: formatExpiry() })}
+                </div>
+              )}
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs mt-3 ml-6"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open("https://apps.apple.com/account/subscriptions", "_blank");
+                }}
+              >
+                {t(lang, "proManage")}
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Privacy */}
         <Card className="cursor-pointer hover:border-primary/30 transition-colors" onClick={onOpenPrivacy}>
