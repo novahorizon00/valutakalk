@@ -82,7 +82,7 @@ export default function SettingsView({
                   ? "9 kr/måned · Fornyes automatisk · 7 dager gratis prøveperiode"
                   : "9 NOK/month · Auto-renews · 7-day free trial"}
               </p>
-              <Button onClick={onUpgrade} size="sm" className="mt-3 bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-semibold text-xs w-full rounded-xl">
+              <Button onClick={onUpgrade} size="sm" className="mt-3 bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-semibold text-xs w-full rounded-xl h-auto py-2.5 whitespace-normal text-center leading-snug">
                 {t(lang, "offlinePaywallCta")}
               </Button>
               <Button onClick={onRestore} variant="ghost" size="sm" className="mt-2 text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/10 text-xs w-full rounded-xl gap-1.5">
