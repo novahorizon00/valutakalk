@@ -159,7 +159,7 @@ const Index = () => {
           animate={{ opacity: 1, scale: 1 }}
           className="text-primary font-display text-2xl font-bold"
         >
-          Offline FX
+          Valutakalk
         </motion.div>
       </div>
     );
