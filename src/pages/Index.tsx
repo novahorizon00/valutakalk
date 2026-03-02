@@ -427,31 +427,35 @@ const Index = () => {
           transition={{ delay: 0.1 }}
           className="flex gap-1.5 items-center"
         >
-          <div className="flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-hide items-center flex-1 min-w-0">
-            {favorites.map((code, i) => {
-              const info = getCurrencyInfo(code);
-              if (!info) return null;
-              const isActive = code === fromCurrency || code === toCurrency;
-              return (
-                <motion.button
-                  key={code}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.03, type: "spring", stiffness: 500, damping: 25 }}
-                  whileTap={{ scale: 0.9 }}
-                  whileHover={{ scale: 1.05 }}
-                  onClick={() => handleFavoriteTap(code)}
-                  className={`flex-shrink-0 flex items-center gap-1.5 pl-1.5 pr-2.5 py-1 rounded-full text-xs font-semibold transition-all duration-200
-                    ${isActive
-                      ? "bg-primary text-primary-foreground shadow-md"
-                      : "bg-card border border-border text-foreground hover:border-primary/30"
-                    }`}
-                >
-                  <FlagIcon currencyCode={code} size={16} />
-                  <span>{code}</span>
-                </motion.button>
-              );
-            })}
+          <div className="relative flex-1 min-w-0">
+            <div className="flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-hide items-center">
+              {favorites.map((code, i) => {
+                const info = getCurrencyInfo(code);
+                if (!info) return null;
+                const isActive = code === fromCurrency || code === toCurrency;
+                return (
+                  <motion.button
+                    key={code}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: i * 0.03, type: "spring", stiffness: 500, damping: 25 }}
+                    whileTap={{ scale: 0.9 }}
+                    whileHover={{ scale: 1.05 }}
+                    onClick={() => handleFavoriteTap(code)}
+                    className={`flex-shrink-0 flex items-center gap-1.5 pl-1.5 pr-2.5 py-1 rounded-full text-xs font-semibold transition-all duration-200
+                      ${isActive
+                        ? "bg-primary text-primary-foreground shadow-md"
+                        : "bg-card border border-border text-foreground hover:border-primary/30"
+                      }`}
+                  >
+                    <FlagIcon currencyCode={code} size={16} />
+                    <span>{code}</span>
+                  </motion.button>
+                );
+              })}
+            </div>
+            {/* Scroll fade hint */}
+            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none" />
           </div>
           <motion.button
             whileTap={{ scale: 0.9, rotate: 15 }}
