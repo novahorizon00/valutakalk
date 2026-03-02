@@ -77,8 +77,8 @@ export default function PrivacyPolicy({ lang, onBack }: PrivacyPolicyProps) {
             </h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
               {isNb
-                ? "Har du spørsmål om personvern? Kontakt oss på support@offlinefx.app."
-                : "Questions about privacy? Contact us at support@offlinefx.app."}
+                ? "Har du spørsmål om personvern? Kontakt oss på valutakalk@gmail.com."
+                : "Questions about privacy? Contact us at valutakalk@gmail.com."}
             </p>
           </CardContent>
         </Card>
