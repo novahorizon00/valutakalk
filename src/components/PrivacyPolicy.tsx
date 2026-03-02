@@ -32,8 +32,8 @@ export default function PrivacyPolicy({ lang, onBack }: PrivacyPolicyProps) {
 
             <p className="text-sm text-muted-foreground leading-relaxed">
               {isNb
-                ? "Offline FX samler ikke inn, lagrer eller deler noen personlige opplysninger. Appen krever ingen innlogging eller brukerregistrering."
-                : "Offline FX does not collect, store, or share any personal information. The app requires no login or user registration."}
+                ? "Valutakalk samler ikke inn, lagrer eller deler noen personlige opplysninger. Appen krever ingen innlogging eller brukerregistrering."
+                : "Valutakalk does not collect, store, or share any personal information. The app requires no login or user registration."}
             </p>
 
             <h3 className="font-semibold text-sm mt-3">
