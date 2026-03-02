@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
+import { motion } from "framer-motion";
 import { X, Star, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { currencies, COMMON_CURRENCY_CODES, getCurrencyName, type CurrencyInfo } from "@/lib/currencies";
@@ -18,7 +19,18 @@ export default function CurrencyPicker({
   lang, favorites, selected, onSelect, onToggleFavorite, onClose,
 }: CurrencyPickerProps) {
   const [search, setSearch] = useState("");
+  const [isClosing, setIsClosing] = useState(false);
 
+  const handleClose = useCallback(() => {
+    setIsClosing(true);
+    setTimeout(onClose, 250);
+  }, [onClose]);
+
+  const handleSelect = useCallback((code: string) => {
+    onSelect(code);
+    setIsClosing(true);
+    setTimeout(onClose, 250);
+  }, [onSelect, onClose]);
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
     if (!q) return null;
@@ -47,11 +59,11 @@ export default function CurrencyPicker({
     return (
       <div
         key={c.code}
-        onClick={() => onSelect(c.code)}
+        onClick={() => handleSelect(c.code)}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            onSelect(c.code);
+            handleSelect(c.code);
           }
         }}
         role="button"
@@ -82,12 +94,17 @@ export default function CurrencyPicker({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-background flex flex-col animate-in slide-in-from-bottom duration-200">
+    <motion.div
+      initial={{ y: "100%" }}
+      animate={{ y: isClosing ? "100%" : 0 }}
+      transition={{ type: "spring", damping: 28, stiffness: 300 }}
+      className="fixed inset-0 z-50 bg-background flex flex-col"
+    >
       {/* Safe area spacer */}
       <div className="safe-top bg-card" />
       {/* Header */}
       <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-card">
-        <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full flex-shrink-0" aria-label={t(lang, "close")}>
+        <Button variant="ghost" size="icon" onClick={handleClose} className="rounded-full flex-shrink-0" aria-label={t(lang, "close")}>
           <X className="h-5 w-5" />
         </Button>
         <div className="relative flex-1 min-w-0">
@@ -100,7 +117,7 @@ export default function CurrencyPicker({
             className="w-full bg-muted border-0 rounded-xl pl-9 pr-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
-        <Button variant="default" size="sm" onClick={onClose} className="flex-shrink-0 rounded-xl font-bold text-xs px-4">
+        <Button variant="default" size="sm" onClick={handleClose} className="flex-shrink-0 rounded-xl font-bold text-xs px-4">
           {t(lang, "done")}
         </Button>
       </div>
@@ -137,6 +154,6 @@ export default function CurrencyPicker({
           </>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }
