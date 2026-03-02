@@ -260,13 +260,13 @@ export default function WidgetSetup({ lang, config, rates, onSave, onBack }: Wid
                 ? [
                     "Hold inne på hjemskjermen til ikonene rister",
                     "Trykk på +-knappen øverst til venstre",
-                    "Søk etter «Offline FX»",
+                    "Søk etter «Valutakalk»",
                     "Velg widgetstørrelsen og trykk «Legg til widget»",
                   ]
                 : [
                     "Long press on your home screen until icons jiggle",
                     "Tap the + button in the top left",
-                    "Search for \"Offline FX\"",
+                    "Search for \"Valutakalk\"",
                     "Choose widget size and tap \"Add Widget\"",
                   ]
               ).map((step, i) => (
