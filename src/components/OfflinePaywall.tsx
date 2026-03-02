@@ -1,15 +1,16 @@
 import React from "react";
-import { Plane } from "lucide-react";
+import { Plane, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { t, type Lang } from "@/lib/i18n";
 
 interface OfflinePaywallProps {
   lang: Lang;
   onUpgrade: () => void;
+  onRestore: () => void;
   onOpenPrivacy?: () => void;
 }
 
-export default function OfflinePaywall({ lang, onUpgrade, onOpenPrivacy }: OfflinePaywallProps) {
+export default function OfflinePaywall({ lang, onUpgrade, onRestore, onOpenPrivacy }: OfflinePaywallProps) {
   const isNb = lang === "nb";
 
   return (
@@ -33,10 +34,20 @@ export default function OfflinePaywall({ lang, onUpgrade, onOpenPrivacy }: Offli
 
         <Button
           onClick={onUpgrade}
-          className="w-full py-5 text-sm font-bold rounded-xl bg-primary-foreground text-primary hover:bg-primary-foreground/90 shadow-lg"
+          className="w-full py-5 text-sm font-bold rounded-xl bg-primary-foreground text-primary hover:bg-primary-foreground/90 shadow-lg h-auto whitespace-normal leading-snug"
           size="lg"
         >
           {t(lang, "offlinePaywallCta")}
+        </Button>
+
+        <Button
+          onClick={onRestore}
+          variant="ghost"
+          size="sm"
+          className="w-full text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/10 text-xs rounded-xl gap-1.5"
+        >
+          <RotateCcw className="h-3 w-3" />
+          {t(lang, "proRestore")}
         </Button>
 
         {/* Terms & Privacy links */}
