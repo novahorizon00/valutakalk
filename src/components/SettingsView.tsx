@@ -224,7 +224,6 @@ export default function SettingsView({
               [t(lang, "lastFetch"), fetchStatus === "error" ? `❌ ${lastError}` : fetchStatus === "success" ? `✅ ${t(lang, "success")}` : "—"],
               [t(lang, "cachedAge"), formatAge()],
               [t(lang, "appVersion"), "1.0.0"],
-              [t(lang, "apiProvider"), "open.er-api.com"],
             ].map(([label, value]) => (
               <div key={label} className="flex justify-between text-xs">
                 <span className="text-muted-foreground">{label}</span>
