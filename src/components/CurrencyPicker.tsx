@@ -109,7 +109,7 @@ export default function CurrencyPicker({
       <div className="flex-1 overflow-y-auto safe-bottom">
         {filtered ? (
           filtered.length === 0 ? (
-            <div className="p-12 text-center text-muted-foreground text-sm">No results</div>
+            <div className="p-12 text-center text-muted-foreground text-sm">{t(lang, "noResults")}</div>
           ) : (
             filtered.map(renderItem)
           )
