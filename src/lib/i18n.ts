@@ -53,6 +53,7 @@ const translations = {
     editChips: "Rediger hurtigbeløp",
     save: "Lagre",
     cancel: "Avbryt",
+    done: "Ferdig",
     apiProvider: "Datakilde",
     // Pro / monetization
     offlinePaywallTitle: "Du er frakoblet",
@@ -144,6 +145,7 @@ const translations = {
     editChips: "Edit quick amounts",
     save: "Save",
     cancel: "Cancel",
+    done: "Done",
     apiProvider: "Data source",
     // Pro / monetization
     offlinePaywallTitle: "You're offline",
