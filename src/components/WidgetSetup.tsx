@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { ArrowLeft, Smartphone, Search, X } from "lucide-react";
+import { ArrowLeft, Smartphone, Search, X, ArrowRightLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import FlagIcon from "@/components/FlagIcon";
@@ -160,25 +160,94 @@ export default function WidgetSetup({ lang, config, rates, onSave, onBack }: Wid
           );
         })}
 
-        {/* Preview */}
-        <Card className="border-primary/20">
-          <CardContent className="pt-4 pb-4">
-            <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-3">
-              {nb ? "Widget-forhåndsvisning" : "Widget Preview"}
-            </div>
-            <div className="bg-muted/50 rounded-2xl p-4 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <FlagIcon currencyCode={c1} size={24} />
-                <span className="font-display font-bold text-sm text-foreground">{c1}</span>
+        {/* Widget Preview – iOS-style mockup */}
+        {(() => {
+          const rate = rates ? getCrossRate(rates.rates, rates.base, c1, c2) : null;
+          const formattedRate = rate
+            ? rate >= 100 ? rate.toFixed(2) : rate >= 1 ? rate.toFixed(4) : rate.toFixed(6)
+            : "—";
+          const ageMs = rates ? Date.now() - rates.timestamp : 0;
+          const ageLabel = !rates
+            ? ""
+            : ageMs < 3_600_000
+              ? (nb ? "< 1 time siden" : "< 1 hour ago")
+              : ageMs < 86_400_000
+                ? `${Math.floor(ageMs / 3_600_000)} ${nb ? "timer siden" : "hours ago"}`
+                : `${Math.floor(ageMs / 86_400_000)} ${nb ? "dager siden" : "days ago"}`;
+
+          return (
+            <div className="space-y-2">
+              <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider px-1">
+                {nb ? "Forhåndsvisning" : "Preview"}
               </div>
-              <span className="text-xs text-muted-foreground font-mono">⇄</span>
-              <div className="flex items-center gap-2">
-                <span className="font-display font-bold text-sm text-foreground">{c2}</span>
-                <FlagIcon currencyCode={c2} size={24} />
+
+              {/* Small widget mockup */}
+              <div className="flex gap-3">
+                <div className="flex-1 bg-muted/60 dark:bg-muted/30 backdrop-blur-sm rounded-[20px] p-3.5 shadow-sm border border-border/30">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <div className="flex items-center gap-1">
+                      <FlagIcon currencyCode={c1} size={14} />
+                      <span className="text-[11px] font-bold text-foreground">{c1}</span>
+                      <span className="text-[9px] text-muted-foreground mx-0.5">→</span>
+                      <FlagIcon currencyCode={c2} size={14} />
+                      <span className="text-[11px] font-bold text-foreground">{c2}</span>
+                    </div>
+                    <ArrowRightLeft className="h-3 w-3 text-primary/60" />
+                  </div>
+                  <div className="font-mono font-bold text-xl text-foreground leading-none tracking-tight">
+                    {formattedRate}
+                  </div>
+                  <div className="mt-2">
+                    <span className="text-[9px] text-muted-foreground">{ageLabel}</span>
+                  </div>
+                </div>
+
+                {/* Medium widget mockup */}
+                <div className="flex-[1.4] bg-muted/60 dark:bg-muted/30 backdrop-blur-sm rounded-[20px] p-3.5 shadow-sm border border-border/30 flex items-center gap-3">
+                  <div className="flex flex-col items-center gap-0.5">
+                    <FlagIcon currencyCode={c1} size={20} />
+                    <span className="text-[10px] font-bold text-foreground">{c1}</span>
+                    <span className="text-[8px] text-muted-foreground">1 {c1}</span>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <ArrowRightLeft className="h-3.5 w-3.5 text-primary/60" />
+                  </div>
+                  <div className="flex flex-col items-center gap-0.5">
+                    <FlagIcon currencyCode={c2} size={20} />
+                    <span className="text-[10px] font-bold text-foreground">{c2}</span>
+                    <span className="font-mono font-bold text-sm text-foreground">{formattedRate}</span>
+                  </div>
+                  <div className="ml-auto">
+                    <span className="text-[8px] text-muted-foreground writing-mode-vertical" style={{ writingMode: "vertical-rl" }}>{ageLabel}</span>
+                  </div>
+                </div>
               </div>
+
+              {/* Lock screen widgets mockup */}
+              <div className="flex gap-3 items-center justify-center">
+                {/* Circular */}
+                <div className="w-[52px] h-[52px] rounded-full bg-foreground/10 dark:bg-foreground/5 border border-foreground/10 flex flex-col items-center justify-center">
+                  <span className="text-[7px] font-bold text-foreground/70">{c1}/{c2}</span>
+                  <span className="font-mono font-bold text-[10px] text-foreground leading-none">{rate ? (rate >= 100 ? rate.toFixed(1) : rate.toFixed(2)) : "—"}</span>
+                </div>
+                {/* Rectangular */}
+                <div className="bg-foreground/10 dark:bg-foreground/5 border border-foreground/10 rounded-xl px-3 py-2 flex-1 max-w-[180px]">
+                  <div className="flex items-center gap-1 mb-0.5">
+                    <span className="text-[8px] font-semibold text-foreground/70">{c1}</span>
+                    <span className="text-[7px] text-foreground/40">→</span>
+                    <span className="text-[8px] font-semibold text-foreground/70">{c2}</span>
+                  </div>
+                  <span className="font-mono font-bold text-sm text-foreground leading-none">{formattedRate}</span>
+                  {ageLabel && <span className="text-[7px] text-foreground/40 block mt-0.5">{ageLabel}</span>}
+                </div>
+              </div>
+
+              <p className="text-[10px] text-center text-muted-foreground/60">
+                {nb ? "Faktisk utseende kan variere" : "Actual appearance may vary"}
+              </p>
             </div>
-          </CardContent>
-        </Card>
+          );
+        })()}
 
         {/* Instructions */}
         <Card>
