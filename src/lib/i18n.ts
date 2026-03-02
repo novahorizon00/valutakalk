@@ -89,6 +89,7 @@ const translations = {
     widgetDescription: "Legg til valuta-widget på hjemskjermen",
     privacyPolicyTitle: "Personvernerklæring",
     privacyPolicyLink: "Les personvernerklæring",
+    termsOfUse: "Vilkår for bruk",
   },
   en: {
     appName: "Offline FX",
@@ -178,6 +179,7 @@ const translations = {
     widgetDescription: "Add currency widget to home screen",
     privacyPolicyTitle: "Privacy Policy",
     privacyPolicyLink: "Read privacy policy",
+    termsOfUse: "Terms of Use",
   },
 } as const;
 

@@ -70,13 +70,18 @@ export default function SettingsView({
       <div className="flex-1 overflow-y-auto px-4 py-5 max-w-lg mx-auto w-full space-y-3">
         {/* Subscription */}
         <Card className={`overflow-hidden ${proStatus.isActive ? "border-primary/30" : "border-border"}`}>
-          {!proStatus.isActive && (
+        {!proStatus.isActive && (
             <div className="gradient-primary px-5 py-4 text-primary-foreground">
               <div className="flex items-center gap-2 mb-1">
                 <Crown className="h-5 w-5" />
                 <span className="font-display font-bold text-base">{t(lang, "proUser")}</span>
               </div>
               <p className="text-xs text-primary-foreground/80">{t(lang, "proDescription")}</p>
+              <p className="text-[10px] text-primary-foreground/70 mt-2">
+                {lang === "nb"
+                  ? "9 kr/måned · Fornyes automatisk · 7 dager gratis prøveperiode"
+                  : "9 NOK/month · Auto-renews · 7-day free trial"}
+              </p>
               <Button onClick={onUpgrade} size="sm" className="mt-3 bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-semibold text-xs w-full rounded-xl">
                 {t(lang, "offlinePaywallCta")}
               </Button>
@@ -84,6 +89,15 @@ export default function SettingsView({
                 <RotateCcw className="h-3 w-3" />
                 {t(lang, "proRestore")}
               </Button>
+              <div className="flex items-center justify-center gap-3 text-[10px] text-primary-foreground/50 mt-3">
+                <a href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary-foreground/70">
+                  {t(lang, "termsOfUse")}
+                </a>
+                <span>·</span>
+                <button onClick={onOpenPrivacy} className="underline hover:text-primary-foreground/70">
+                  {t(lang, "privacyPolicyTitle")}
+                </button>
+              </div>
             </div>
           )}
           {proStatus.isActive && (
