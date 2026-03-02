@@ -107,7 +107,8 @@ export default function CurrencyPicker({
         initial={{ y: "100%" }}
         animate={{ y: isClosing ? "100%" : 0 }}
         transition={{ type: "spring", damping: 28, stiffness: 300 }}
-        className="fixed inset-0 z-50 bg-background flex flex-col"
+        className="fixed inset-x-0 bottom-0 z-50 bg-background flex flex-col rounded-t-2xl shadow-2xl"
+        style={{ height: '85%' }}
       >
       {/* Safe area spacer */}
       <div className="safe-top bg-card" />
