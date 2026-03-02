@@ -167,7 +167,7 @@ const Index = () => {
 
   if (view === "history") return <HistoryView history={history} lang={lang} onBack={() => setView("converter")} onClear={clearAllHistory} />;
   if (view === "settings") return <SettingsView settings={settings} lang={lang} fetchStatus={fetchStatus} lastError={lastError} rates={rates} proStatus={proStatus} onBack={() => setView("converter")} onUpdate={updateSettings} onUpgrade={handleUpgrade} onRestore={handleRestore} onOpenWidget={() => setView("widget")} onOpenPrivacy={() => setView("privacy")} />;
-  if (view === "widget") return <WidgetSetup lang={lang} config={widgetConfig} onSave={setWidgetConfig} onBack={() => setView("settings")} />;
+  if (view === "widget") return <WidgetSetup lang={lang} config={widgetConfig} rates={rates} onSave={setWidgetConfig} onBack={() => setView("settings")} />;
   if (view === "privacy") return <PrivacyPolicy lang={lang} onBack={() => setView("settings")} />;
 
   return (

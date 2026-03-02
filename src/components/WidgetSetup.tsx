@@ -5,6 +5,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import FlagIcon from "@/components/FlagIcon";
 import { currencies, COMMON_CURRENCY_CODES, getCurrencyName } from "@/lib/currencies";
 import { t, type Lang } from "@/lib/i18n";
+import { getCrossRate } from "@/lib/rateService";
+import { saveWidgetConfig, isNativePlatform } from "@/lib/widgetBridge";
+import type { CachedRates } from "@/lib/storage";
+import { toast } from "sonner";
 
 export interface WidgetConfig {
   currency1: string;
@@ -14,13 +18,14 @@ export interface WidgetConfig {
 interface WidgetSetupProps {
   lang: Lang;
   config: WidgetConfig;
+  rates: CachedRates | null;
   onSave: (config: WidgetConfig) => void;
   onBack: () => void;
 }
 
 type EditingSlot = "currency1" | "currency2" | null;
 
-export default function WidgetSetup({ lang, config, onSave, onBack }: WidgetSetupProps) {
+export default function WidgetSetup({ lang, config, rates, onSave, onBack }: WidgetSetupProps) {
   const [c1, setC1] = useState(config.currency1);
   const [c2, setC2] = useState(config.currency2);
   const [editing, setEditing] = useState<EditingSlot>(null);
@@ -42,8 +47,21 @@ export default function WidgetSetup({ lang, config, onSave, onBack }: WidgetSetu
     setSearch("");
   };
 
-  const handleSave = () => {
-    onSave({ currency1: c1, currency2: c2 });
+  const handleSave = async () => {
+    const newConfig = { currency1: c1, currency2: c2 };
+    onSave(newConfig);
+
+    // Push data to native widget layer
+    if (rates) {
+      const rate = getCrossRate(rates.rates, rates.base, c1, c2);
+      if (rate) {
+        const saved = await saveWidgetConfig(c1, c2, rate);
+        if (saved) {
+          toast.success(nb ? "Widget oppdatert!" : "Widget updated!");
+        }
+      }
+    }
+
     onBack();
   };
 
