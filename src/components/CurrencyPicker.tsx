@@ -86,7 +86,10 @@ export default function CurrencyPicker({
       {/* Safe area spacer */}
       <div className="safe-top bg-card" />
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-card">
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-card">
+        <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full flex-shrink-0" aria-label={t(lang, "close")}>
+          <X className="h-5 w-5" />
+        </Button>
         <div className="relative flex-1 min-w-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
@@ -97,8 +100,8 @@ export default function CurrencyPicker({
             className="w-full bg-muted border-0 rounded-xl pl-9 pr-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
-        <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full" aria-label={t(lang, "close")}>
-          <X className="h-5 w-5" />
+        <Button variant="default" size="sm" onClick={onClose} className="flex-shrink-0 rounded-xl font-bold text-xs px-4">
+          {t(lang, "done")}
         </Button>
       </div>
 
