@@ -45,10 +45,18 @@ export default function CurrencyPicker({
     const isFav = favorites.includes(c.code);
     const isSel = c.code === selected;
     return (
-      <button
+      <div
         key={c.code}
         onClick={() => onSelect(c.code)}
-        className={`w-full flex items-center gap-3.5 px-4 py-3 text-left transition-all
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onSelect(c.code);
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        className={`w-full flex items-center gap-3.5 px-4 py-3 text-left transition-all cursor-pointer
           ${isSel ? "gradient-primary-subtle border-l-2 border-l-primary" : "hover:bg-muted/60"}`}
       >
         <FlagIcon currencyCode={c.code} size={28} />
@@ -62,13 +70,14 @@ export default function CurrencyPicker({
           </div>
         </div>
         <button
+          type="button"
           onClick={(e) => { e.stopPropagation(); onToggleFavorite(c.code); }}
           className="p-2 rounded-full hover:bg-secondary transition-colors"
           aria-label={isFav ? t(lang, "removeFavorite") : t(lang, "addFavorite")}
         >
           <Star className={`h-4 w-4 transition-colors ${isFav ? "fill-warning text-warning" : "text-muted-foreground/40"}`} />
         </button>
-      </button>
+      </div>
     );
   };
 
@@ -78,7 +87,7 @@ export default function CurrencyPicker({
       <div className="safe-top bg-card" />
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-card">
-        <div className="relative flex-1">
+        <div className="relative flex-1 min-w-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             autoFocus
