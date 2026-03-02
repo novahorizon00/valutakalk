@@ -8,9 +8,10 @@ interface OfflinePaywallProps {
   onUpgrade: () => void;
   onRestore: () => void;
   onOpenPrivacy?: () => void;
+  hadPreviousSubscription?: boolean;
 }
 
-export default function OfflinePaywall({ lang, onUpgrade, onRestore, onOpenPrivacy }: OfflinePaywallProps) {
+export default function OfflinePaywall({ lang, onUpgrade, onRestore, onOpenPrivacy, hadPreviousSubscription }: OfflinePaywallProps) {
   const isNb = lang === "nb";
 
   return (
@@ -49,6 +50,15 @@ export default function OfflinePaywall({ lang, onUpgrade, onRestore, onOpenPriva
           <RotateCcw className="h-3 w-3" />
           {t(lang, "proRestore")}
         </Button>
+
+        {hadPreviousSubscription && (
+          <button
+            onClick={() => window.open("https://apps.apple.com/account/subscriptions", "_blank")}
+            className="text-[11px] text-primary-foreground/70 underline hover:text-primary-foreground/90"
+          >
+            {t(lang, "proManage")}
+          </button>
+        )}
 
         {/* Terms & Privacy links */}
         <div className="flex items-center justify-center gap-3 text-[10px] text-primary-foreground/60">

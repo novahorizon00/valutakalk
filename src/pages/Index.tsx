@@ -365,7 +365,7 @@ const Index = () => {
 
           {/* TO: currency selector + result */}
           {showOfflinePaywall ? (
-            <OfflinePaywall lang={lang} onUpgrade={handleUpgrade} onRestore={handleRestore} onOpenPrivacy={() => setView("privacy")} />
+            <OfflinePaywall lang={lang} onUpgrade={handleUpgrade} onRestore={handleRestore} onOpenPrivacy={() => setView("privacy")} hadPreviousSubscription={!!proStatus.purchasedAt && !proStatus.isActive} />
           ) : (
             <motion.div
               layout
