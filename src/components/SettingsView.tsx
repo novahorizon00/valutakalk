@@ -24,10 +24,11 @@ interface SettingsViewProps {
   onUpgrade: () => void;
   onRestore: () => void;
   onOpenWidget: () => void;
+  onOpenPrivacy: () => void;
 }
 
 export default function SettingsView({
-  settings, lang, fetchStatus, lastError, rates, proStatus, onBack, onUpdate, onUpgrade, onRestore, onOpenWidget,
+  settings, lang, fetchStatus, lastError, rates, proStatus, onBack, onUpdate, onUpgrade, onRestore, onOpenWidget, onOpenPrivacy,
 }: SettingsViewProps) {
   const [chipsInput, setChipsInput] = useState(settings.quickAmounts.join(", "));
   const { theme, setTheme } = useTheme();
@@ -248,10 +249,11 @@ export default function SettingsView({
         </Card>
 
         {/* Privacy */}
-        <Card>
+        <Card className="cursor-pointer hover:border-primary/30 transition-colors" onClick={onOpenPrivacy}>
           <CardContent className="pt-5 pb-4">
             <span className="font-semibold text-sm block mb-1">{t(lang, "privacy")}</span>
             <p className="text-xs text-muted-foreground">{t(lang, "privacyText")}</p>
+            <span className="text-xs text-primary font-medium mt-2 block">{t(lang, "privacyPolicyLink")} →</span>
           </CardContent>
         </Card>
 
