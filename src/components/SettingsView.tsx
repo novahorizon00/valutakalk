@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, Globe, Crown, Sun, Moon, Monitor, Smartphone, RotateCcw } from "lucide-react";
+import { ArrowLeft, Globe, Crown, Sun, Moon, Monitor, Smartphone, RotateCcw, Mail, AlertTriangle, Database, ExternalLink } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -265,12 +265,55 @@ export default function SettingsView({
           </Card>
         )}
 
+        {/* Rate disclaimer */}
+        <Card>
+          <CardContent className="pt-5 pb-4">
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="h-4 w-4 text-warning flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-muted-foreground leading-relaxed">{t(lang, "rateDisclaimer")}</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Data source */}
+        <Card>
+          <CardContent className="pt-5 pb-4">
+            <div className="flex items-center gap-2 mb-1">
+              <Database className="h-4 w-4 text-muted-foreground" />
+              <span className="font-semibold text-sm">{t(lang, "dataSource")}</span>
+            </div>
+            <p className="text-xs text-muted-foreground">{t(lang, "dataSourceDesc")}</p>
+          </CardContent>
+        </Card>
+
         {/* Privacy */}
         <Card className="cursor-pointer hover:border-primary/30 transition-colors" onClick={onOpenPrivacy}>
           <CardContent className="pt-5 pb-4">
             <span className="font-semibold text-sm block mb-1">{t(lang, "privacy")}</span>
             <p className="text-xs text-muted-foreground">{t(lang, "privacyText")}</p>
             <span className="text-xs text-primary font-medium mt-2 block">{t(lang, "privacyPolicyLink")} →</span>
+          </CardContent>
+        </Card>
+
+        {/* Terms of Use */}
+        <Card className="cursor-pointer hover:border-primary/30 transition-colors" onClick={() => window.open("https://www.apple.com/legal/internet-services/itunes/dev/stdeula/", "_blank")}>
+          <CardContent className="pt-5 pb-4">
+            <div className="flex items-center justify-between">
+              <span className="font-semibold text-sm">{t(lang, "termsOfUse")}</span>
+              <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Contact / Support */}
+        <Card className="cursor-pointer hover:border-primary/30 transition-colors" onClick={() => window.open("mailto:valutakalk@gmail.com")}>
+          <CardContent className="pt-5 pb-4">
+            <div className="flex items-center gap-2 mb-1">
+              <Mail className="h-4 w-4 text-muted-foreground" />
+              <span className="font-semibold text-sm">{t(lang, "contactSupport")}</span>
+            </div>
+            <p className="text-xs text-muted-foreground">{t(lang, "contactSupportDesc")}</p>
+            <span className="text-xs text-primary font-medium mt-1 block">valutakalk@gmail.com</span>
           </CardContent>
         </Card>
 

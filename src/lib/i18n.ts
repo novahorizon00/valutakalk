@@ -93,6 +93,11 @@ const translations = {
     privacyPolicyTitle: "Personvernerklæring",
     privacyPolicyLink: "Les personvernerklæring",
     termsOfUse: "Vilkår for bruk",
+    contactSupport: "Kontakt / støtte",
+    contactSupportDesc: "Spørsmål eller tilbakemeldinger? Send oss en e-post.",
+    rateDisclaimer: "Valutakursene er veiledende og kan avvike fra faktiske bank- eller markedskurser. Bekreft alltid kurser før endelige transaksjoner.",
+    dataSource: "Datakilde",
+    dataSourceDesc: "Kurser fra ExchangeRate-API (open.er-api.com)",
   },
   en: {
     appName: "Valutakalk",
@@ -186,6 +191,11 @@ const translations = {
     privacyPolicyTitle: "Privacy Policy",
     privacyPolicyLink: "Read privacy policy",
     termsOfUse: "Terms of Use",
+    contactSupport: "Contact / Support",
+    contactSupportDesc: "Questions or feedback? Send us an email.",
+    rateDisclaimer: "Exchange rates are indicative and may differ from actual bank or market rates. Always verify rates before final transactions.",
+    dataSource: "Data source",
+    dataSourceDesc: "Rates from ExchangeRate-API (open.er-api.com)",
   },
 } as const;
 
