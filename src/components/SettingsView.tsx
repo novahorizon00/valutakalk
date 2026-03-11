@@ -275,14 +275,13 @@ export default function SettingsView({
           </CardContent>
         </Card>
 
-        {/* Data source */}
-        <Card>
+        {/* Terms of Use */}
+        <Card className="cursor-pointer hover:border-primary/30 transition-colors" onClick={() => window.open("https://www.apple.com/legal/internet-services/itunes/dev/stdeula/", "_blank")}>
           <CardContent className="pt-5 pb-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Database className="h-4 w-4 text-muted-foreground" />
-              <span className="font-semibold text-sm">{t(lang, "dataSource")}</span>
+            <div className="flex items-center justify-between">
+              <span className="font-semibold text-sm">{t(lang, "termsOfUse")}</span>
+              <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
             </div>
-            <p className="text-xs text-muted-foreground">{t(lang, "dataSourceDesc")}</p>
           </CardContent>
         </Card>
 
@@ -295,13 +294,14 @@ export default function SettingsView({
           </CardContent>
         </Card>
 
-        {/* Terms of Use */}
-        <Card className="cursor-pointer hover:border-primary/30 transition-colors" onClick={() => window.open("https://www.apple.com/legal/internet-services/itunes/dev/stdeula/", "_blank")}>
+        {/* Data source */}
+        <Card>
           <CardContent className="pt-5 pb-4">
-            <div className="flex items-center justify-between">
-              <span className="font-semibold text-sm">{t(lang, "termsOfUse")}</span>
-              <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
+            <div className="flex items-center gap-2 mb-1">
+              <Database className="h-4 w-4 text-muted-foreground" />
+              <span className="font-semibold text-sm">{t(lang, "dataSource")}</span>
             </div>
+            <p className="text-xs text-muted-foreground">{t(lang, "dataSourceDesc")}</p>
           </CardContent>
         </Card>
 
