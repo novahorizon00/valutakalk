@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, Globe, Crown, Sun, Moon, Monitor, Smartphone, RotateCcw } from "lucide-react";
+import { ArrowLeft, Globe, Crown, Sun, Moon, Monitor, Smartphone, RotateCcw, Mail, AlertTriangle, Database, ExternalLink } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
