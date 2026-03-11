@@ -22,7 +22,7 @@ import PrivacyPolicy from "@/components/PrivacyPolicy";
 
 type View = "converter" | "history" | "settings" | "widget" | "privacy";
 
-const ONBOARDING_KEY = "offline-fx-onboarding-done";
+const ONBOARDING_KEY = "valutakalk-onboarding-done";
 
 const Index = () => {
   const {

@@ -1,7 +1,7 @@
 {
-  "name": "Offline FX – Valutakalkulator",
-  "short_name": "Offline FX",
-  "description": "Offline-first currency converter for travelers. Convert 170+ currencies with cached rates.",
+  "name": "Valutakalk – Valutakalkulator",
+  "short_name": "Valutakalk",
+  "description": "Konverter 150+ valutaer offline. Last ned kurser før reisen og regn om hvor som helst.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f5f5fa",
