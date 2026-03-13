@@ -202,6 +202,12 @@ const translations = {
     rateDisclaimer: "Exchange rates are indicative and may differ from actual bank or market rates. Always verify rates before final transactions.",
     dataSource: "Data source",
     dataSourceDesc: "Rates from ExchangeRate-API (open.er-api.com)",
+    addToSum: "Add to sum",
+    shoppingTotal: "Shopping cart",
+    totalInCurrency: "Total in {currency}",
+    clearSum: "Clear",
+    itemsCount: "{count} items",
+    sumEmpty: "Tap + to add amounts",
   },
 } as const;
 
