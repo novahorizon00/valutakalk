@@ -43,6 +43,7 @@ const Index = () => {
   const [widgetConfig, setWidgetConfig] = useState<WidgetConfig>({ currency1: "NOK", currency2: "EUR" });
   const [showKeypad, setShowKeypad] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [sumItems, setSumItems] = useState<SumItem[]>([]);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   const lang: Lang = settings?.language ?? "nb";
