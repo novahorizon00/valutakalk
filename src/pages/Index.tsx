@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeftRight, RefreshCw, History, Settings, Wifi, WifiOff, ChevronRight, Plane, Keyboard, Pencil, Plus } from "lucide-react";
+import { ArrowLeftRight, RefreshCw, History, Settings, Wifi, WifiOff, ChevronRight, Plane, Keyboard, Pencil, Plus, ShoppingCart } from "lucide-react";
 import FlagIcon from "@/components/FlagIcon";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
