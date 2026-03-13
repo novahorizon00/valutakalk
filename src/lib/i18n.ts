@@ -98,6 +98,12 @@ const translations = {
     rateDisclaimer: "Valutakursene er veiledende og kan avvike fra faktiske bank- eller markedskurser. Bekreft alltid kurser før endelige transaksjoner.",
     dataSource: "Datakilde",
     dataSourceDesc: "Kurser fra ExchangeRate-API (open.er-api.com)",
+    addToSum: "Legg til i sum",
+    shoppingTotal: "Handlekurv",
+    totalInCurrency: "Totalt i {currency}",
+    clearSum: "Tøm",
+    itemsCount: "{count} varer",
+    sumEmpty: "Trykk + for å legge til beløp",
   },
   en: {
     appName: "Valutakalk",
@@ -196,6 +202,12 @@ const translations = {
     rateDisclaimer: "Exchange rates are indicative and may differ from actual bank or market rates. Always verify rates before final transactions.",
     dataSource: "Data source",
     dataSourceDesc: "Rates from ExchangeRate-API (open.er-api.com)",
+    addToSum: "Add to sum",
+    shoppingTotal: "Shopping cart",
+    totalInCurrency: "Total in {currency}",
+    clearSum: "Clear",
+    itemsCount: "{count} items",
+    sumEmpty: "Tap + to add amounts",
   },
 } as const;
 

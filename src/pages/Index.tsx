@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeftRight, RefreshCw, History, Settings, Wifi, WifiOff, ChevronRight, Plane, Keyboard, Pencil, Plus } from "lucide-react";
+import { ArrowLeftRight, RefreshCw, History, Settings, Wifi, WifiOff, ChevronRight, Plane, Keyboard, Pencil, Plus, ShoppingCart } from "lucide-react";
 import FlagIcon from "@/components/FlagIcon";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +19,7 @@ import NumericKeypad from "@/components/NumericKeypad";
 import OnboardingGuide from "@/components/OnboardingGuide";
 import FavoritesManager from "@/components/FavoritesManager";
 import PrivacyPolicy from "@/components/PrivacyPolicy";
+import SumCart, { type SumItem } from "@/components/SumCart";
 
 type View = "converter" | "history" | "settings" | "widget" | "privacy";
 
@@ -42,6 +43,7 @@ const Index = () => {
   const [widgetConfig, setWidgetConfig] = useState<WidgetConfig>({ currency1: "NOK", currency2: "EUR" });
   const [showKeypad, setShowKeypad] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [sumItems, setSumItems] = useState<SumItem[]>([]);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   const lang: Lang = settings?.language ?? "nb";
@@ -129,6 +131,26 @@ const Index = () => {
     localStorage.setItem(ONBOARDING_KEY, "1");
     setShowOnboarding(false);
   };
+
+  const handleAddToSum = () => {
+    if (result === null) return;
+    const num = parseFloat(amount);
+    if (isNaN(num) || num <= 0) return;
+    const item: SumItem = {
+      id: Date.now().toString(),
+      amount: num,
+      fromCurrency,
+      converted: result,
+      toCurrency,
+    };
+    setSumItems((prev) => [...prev, item]);
+  };
+
+  const handleRemoveSumItem = (id: string) => {
+    setSumItems((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const handleClearSum = () => setSumItems([]);
 
   const locale = lang === "nb" ? "nb-NO" : "en-US";
   const formatResult = (num: number): string => {
@@ -385,23 +407,39 @@ const Index = () => {
                 </div>
                 <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
               </button>
-              <div className="bg-muted/50 border border-border rounded-xl px-4 py-3 min-h-[60px] flex items-center">
-                <AnimatePresence mode="wait">
-                  {result !== null ? (
-                    <motion.span
-                      key={result}
-                      initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
-                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                      exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      className="text-3xl font-display font-bold text-foreground tracking-tight"
-                    >
-                      {formatResult(result)}
-                    </motion.span>
-                  ) : (
-                    <span className="text-3xl font-display font-bold text-muted-foreground/30">—</span>
-                  )}
-                </AnimatePresence>
+              <div className="bg-muted/50 border border-border rounded-xl px-4 py-3 min-h-[60px] flex items-center gap-2">
+                <div className="flex-1">
+                  <AnimatePresence mode="wait">
+                    {result !== null ? (
+                      <motion.span
+                        key={result}
+                        initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
+                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                        exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                        className="text-3xl font-display font-bold text-foreground tracking-tight"
+                      >
+                        {formatResult(result)}
+                      </motion.span>
+                    ) : (
+                      <span className="text-3xl font-display font-bold text-muted-foreground/30">—</span>
+                    )}
+                  </AnimatePresence>
+                </div>
+                {result !== null && (
+                  <motion.button
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    whileTap={{ scale: 0.85 }}
+                    whileHover={{ scale: 1.1 }}
+                    onClick={handleAddToSum}
+                    className="flex-shrink-0 flex items-center justify-center h-9 w-9 rounded-xl bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground border border-primary/20 hover:border-primary transition-all duration-200"
+                    aria-label={t(lang, "addToSum")}
+                    title={t(lang, "addToSum")}
+                  >
+                    <ShoppingCart className="h-4 w-4" />
+                  </motion.button>
+                )}
               </div>
               {rate !== null && (
                 <motion.div
@@ -419,6 +457,20 @@ const Index = () => {
             </motion.div>
           )}
         </div>
+
+        {/* Shopping sum cart */}
+        <AnimatePresence>
+          {sumItems.length > 0 && (
+            <SumCart
+              items={sumItems}
+              lang={lang}
+              toCurrency={toCurrency}
+              onRemove={handleRemoveSumItem}
+              onClear={handleClearSum}
+              formatResult={formatResult}
+            />
+          )}
+        </AnimatePresence>
 
         {/* Favorites / Quick currencies */}
         <motion.div
