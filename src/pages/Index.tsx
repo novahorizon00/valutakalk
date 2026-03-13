@@ -132,6 +132,26 @@ const Index = () => {
     setShowOnboarding(false);
   };
 
+  const handleAddToSum = () => {
+    if (result === null) return;
+    const num = parseFloat(amount);
+    if (isNaN(num) || num <= 0) return;
+    const item: SumItem = {
+      id: Date.now().toString(),
+      amount: num,
+      fromCurrency,
+      converted: result,
+      toCurrency,
+    };
+    setSumItems((prev) => [...prev, item]);
+  };
+
+  const handleRemoveSumItem = (id: string) => {
+    setSumItems((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const handleClearSum = () => setSumItems([]);
+
   const locale = lang === "nb" ? "nb-NO" : "en-US";
   const formatResult = (num: number): string => {
     if (num >= 1000) return num.toLocaleString(locale, { maximumFractionDigits: 2 });
