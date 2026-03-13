@@ -458,6 +458,20 @@ const Index = () => {
           )}
         </div>
 
+        {/* Shopping sum cart */}
+        <AnimatePresence>
+          {sumItems.length > 0 && (
+            <SumCart
+              items={sumItems}
+              lang={lang}
+              toCurrency={toCurrency}
+              onRemove={handleRemoveSumItem}
+              onClear={handleClearSum}
+              formatResult={formatResult}
+            />
+          )}
+        </AnimatePresence>
+
         {/* Favorites / Quick currencies */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
