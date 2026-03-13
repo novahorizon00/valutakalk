@@ -19,6 +19,7 @@ import NumericKeypad from "@/components/NumericKeypad";
 import OnboardingGuide from "@/components/OnboardingGuide";
 import FavoritesManager from "@/components/FavoritesManager";
 import PrivacyPolicy from "@/components/PrivacyPolicy";
+import SumCart, { type SumItem } from "@/components/SumCart";
 
 type View = "converter" | "history" | "settings" | "widget" | "privacy";
 
