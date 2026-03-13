@@ -407,23 +407,39 @@ const Index = () => {
                 </div>
                 <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
               </button>
-              <div className="bg-muted/50 border border-border rounded-xl px-4 py-3 min-h-[60px] flex items-center">
-                <AnimatePresence mode="wait">
-                  {result !== null ? (
-                    <motion.span
-                      key={result}
-                      initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
-                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                      exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      className="text-3xl font-display font-bold text-foreground tracking-tight"
-                    >
-                      {formatResult(result)}
-                    </motion.span>
-                  ) : (
-                    <span className="text-3xl font-display font-bold text-muted-foreground/30">—</span>
-                  )}
-                </AnimatePresence>
+              <div className="bg-muted/50 border border-border rounded-xl px-4 py-3 min-h-[60px] flex items-center gap-2">
+                <div className="flex-1">
+                  <AnimatePresence mode="wait">
+                    {result !== null ? (
+                      <motion.span
+                        key={result}
+                        initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
+                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                        exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                        className="text-3xl font-display font-bold text-foreground tracking-tight"
+                      >
+                        {formatResult(result)}
+                      </motion.span>
+                    ) : (
+                      <span className="text-3xl font-display font-bold text-muted-foreground/30">—</span>
+                    )}
+                  </AnimatePresence>
+                </div>
+                {result !== null && (
+                  <motion.button
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    whileTap={{ scale: 0.85 }}
+                    whileHover={{ scale: 1.1 }}
+                    onClick={handleAddToSum}
+                    className="flex-shrink-0 flex items-center justify-center h-9 w-9 rounded-xl bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground border border-primary/20 hover:border-primary transition-all duration-200"
+                    aria-label={t(lang, "addToSum")}
+                    title={t(lang, "addToSum")}
+                  >
+                    <ShoppingCart className="h-4 w-4" />
+                  </motion.button>
+                )}
               </div>
               {rate !== null && (
                 <motion.div
