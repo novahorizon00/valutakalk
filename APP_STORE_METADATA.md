@@ -21,6 +21,7 @@ Skriv inn et beløp, velg valuta og se resultatet umiddelbart. Perfekt for reise
 FUNKSJONER:
 • Rask konvertering mellom 150+ valutaer
 • Daglig oppdaterte valutakurser
+• Handlekurv – legg sammen flere konverteringer og se totalen
 • Favorittvalutaer for rask tilgang
 • Hurtigbeløp-knapper (10, 25, 50, 100, 500)
 • Mørk modus og lyst tema
@@ -58,6 +59,7 @@ Enter an amount, select your currencies, and see results instantly. Perfect for 
 FEATURES:
 • Fast conversion between 150+ currencies
 • Daily updated exchange rates
+• Shopping cart – add multiple conversions and see the total
 • Favorite currencies for quick access
 • Quick amount buttons (10, 25, 50, 100, 500)
 • Dark mode and light theme
