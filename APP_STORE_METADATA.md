@@ -59,6 +59,7 @@ Enter an amount, select your currencies, and see results instantly. Perfect for 
 FEATURES:
 • Fast conversion between 150+ currencies
 • Daily updated exchange rates
+• Shopping cart – add multiple conversions and see the total
 • Favorite currencies for quick access
 • Quick amount buttons (10, 25, 50, 100, 500)
 • Dark mode and light theme
